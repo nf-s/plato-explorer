@@ -10,9 +10,7 @@ Select **Love** to see its 164 neighbours under the default filters. The sidebar
 
 Select **Music** and find **Confucius** in the sidebar. Choose **Mentions** to see the 18 passages where the Confucius entry mentions music. Selecting a passage takes you to that sentence in the article.
 
-![Music selected with the Confucius connection and its Mentions button in the sidebar](docs/screenshots/music.png)
-
-![The first Music and Confucius passage with the word “music” highlighted and a link to the introduction](docs/screenshots/mentions.png)
+![The Music network with the Confucius Mentions sidebar open, showing article passages and highlighting the matched words](docs/screenshots/music.png)
 
 The brief excerpts in these screenshots are from the _Stanford Encyclopedia of Philosophy_. [“Love” by Bennett Helm](https://plato.stanford.edu/entries/love/) · [“Confucius” by Mark Csikszentmihalyi](https://plato.stanford.edu/entries/confucius/)
 
