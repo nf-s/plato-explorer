@@ -1,8 +1,8 @@
 # Public Cloudflare Pages deployment
 
-The current public app is [plato-network.pages.dev](https://plato-network.pages.dev/). Cloudflare Pages serves the frontend, graph, article JSON, and search index without sign-in. The Pages project is `plato-network` and its production branch is `main`.
+Cloudflare Pages serves the frontend, graph, article JSON, and search index without sign-in. The Pages project is `plato-network` and its production branch is `main`.
 
-This is a Direct Upload project with no connected Git source. Pushing source to GitHub does not deploy the app. Releases upload the verified local files with Wrangler. Cloudflare returns a deployment-specific `https://<deployment-id>.plato-network.pages.dev` URL alongside the stable canonical address.
+This is a Direct Upload project with no connected Git source. Pushing source to GitHub does not deploy the app. Releases upload the verified local files with Wrangler. Wrangler reports the deployment URL after each release.
 
 The public project has no Pages Functions, D1 bindings, environment variables, or authentication API. The previous private Worker and its access database have their own resources. [Legacy deployment reference](deployment.md)
 
@@ -60,7 +60,7 @@ On iPhone Safari, choose **Share → Add to Home Screen**, enable **Open as Web 
 
 ## Verify a release
 
-Confirm that Pages reports a successful production deployment for `plato-network`, `uses_functions: false`, no Git source, and no D1 bindings or environment variables. Record the deployment-specific URL with the verification results and continue sharing the canonical URL.
+Confirm that Pages reports a successful production deployment for `plato-network`, `uses_functions: false`, no Git source, and no D1 bindings or environment variables. Keep the deployment ID with the local verification results.
 
 Check unauthenticated GET and HEAD requests against both canonical and deployment-specific hostnames for the following assets.
 
@@ -74,6 +74,6 @@ Browser-check desktop and mobile graph layout, full-text queries such as `panopt
 
 ## NFS home directory
 
-[NFS home](https://nf-s.github.io/nfs-home/links/) links to the canonical `https://plato-network.pages.dev/` URL without a sign-in label. Its source is `docs/links/index.html` in the separate `nf-s/nfs-home` repository. The launcher grid uses `<a class="app" ... target="_self">` links. Follow that existing markup and preserve the single Plato entry across releases.
+The separate NFS home launcher maintains its own Plato entry. Its source is `docs/links/index.html` in the separate `nf-s/nfs-home` repository. The launcher grid uses `<a class="app" ... target="_self">` links. Follow that existing markup and preserve the single Plato entry across releases.
 
 If the canonical address changes, update and verify that separate directory entry using the target repository's current `AGENTS.md` and publishing workflow. Those instructions govern its Git operations. A Cloudflare upload and publication of an NFS home change are separate actions. Check the published directory after editing its link.

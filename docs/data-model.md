@@ -2,9 +2,11 @@
 
 ## Source selection
 
-The build reads `data/good-one.parquet`. This structured export was chosen from five overlapping snapshots because it preserves editorial related entries alongside titles, section structure and bibliographies. The optional `python3 scripts/fetch_source.py` command downloads the primary Parquet from `hugfaceguy0001/stanford_plato` at revision `1076853c2f3eefc47bba652dc00459018ce695d1` and verifies its SHA-256. It is a third-party export. Check the terms for your use before downloading. [Dataset](https://huggingface.co/datasets/hugfaceguy0001/stanford_plato) · [Fetcher](../scripts/fetch_source.py) · [Copyright and terms](../COPYRIGHT.md)
+The graph, article reader and search index use the structured Parquet export from `hugfaceguy0001/stanford_plato`. It preserves editorial related entries alongside the article text, section structure and bibliographies. The builder preserves case in SEP article IDs. [Article dataset](https://huggingface.co/datasets/hugfaceguy0001/stanford_plato)
 
-The original investigation also compared paragraph-based Parquet, full-text Parquet, PDF-derived CSV and a December 2023 JSONL. Combining them would double-count passages and mix revisions. If you already hold an authorized copy of `stanford-encyclopedia-of-philosophy_dec23.jsonl`, place it beside the primary Parquet to add author attribution where available. All other processing uses the primary snapshot. The fetcher retrieves only that file. The reader preserves the supplied text and section structure, including uppercase characters in SEP IDs. [Source validation and extraction](../scripts/build_data.py)
+The December 2023 snapshot from `dmarx` supplies author credits. The builder matches records by SEP entry URL and extracts the copyright year and author names where available. Using one source for article text avoids counting passages twice or mixing revisions. [Attribution dataset](https://huggingface.co/datasets/dmarx/stanford-encyclopedia-of-philosophy_dec23) · [Source extraction](../scripts/build_data.py)
+
+`python3 scripts/fetch_source.py` downloads both files into the ignored `data/` directory. The script pins each Hugging Face revision and verifies its SHA-256 checksum. [Fetcher and pinned revisions](../scripts/fetch_source.py) · [Copyright and terms](../COPYRIGHT.md)
 
 All input types and nested list structures are validated before processing. No article HTML is injected into the page. The reader creates text nodes and a small set of known DOM elements, and accepts only SEP HTTPS URLs for external article links.
 
@@ -30,7 +32,7 @@ This example shows the graph structure with empty arrays. Local builds fill the 
 {
   "version": 1,
   "meta": {
-    "source": "good-one.parquet",
+    "source": "stanford_plato.parquet",
     "sourceSha256": "...",
     "articles": 0,
     "nodes": 0,

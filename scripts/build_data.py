@@ -1,4 +1,4 @@
-"""Build the complete local graph and lazily loaded article files from Good One."""
+"""Build the local graph and article files from the structured SEP snapshot."""
 
 import argparse
 import hashlib
@@ -12,6 +12,7 @@ import pyarrow.parquet as pq
 
 from categories import people_ids, subject
 from extra_nodes import load_extra_nodes
+from fetch_source import ARTICLE_FILENAME, ATTRIBUTION_FILENAME
 from layout import communities_and_layout
 from text_processing import MentionMatcher, clean_text, resolve_entry
 
@@ -146,7 +147,7 @@ def build(source, output):
         if article_id not in ids or any(term not in [titles[article_id], *aliases.get(article_id, [])] for term in entry["aliases"]):
             raise ValueError(f"Context rule refers to an unknown target or matched term: {article_id}")
     matcher = MentionMatcher(titles, aliases, rules)
-    attributions = attribution_index(source.parent / "stanford-encyclopedia-of-philosophy_dec23.jsonl")
+    attributions = attribution_index(source.parent / ATTRIBUTION_FILENAME)
     output.mkdir(parents=True, exist_ok=True)
     article_dir = output / "articles"
     article_dir.mkdir(exist_ok=True)
@@ -239,7 +240,7 @@ def build(source, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=ROOT / "data/good-one.parquet")
+    parser.add_argument("--source", type=Path, default=ROOT / "data" / ARTICLE_FILENAME)
     parser.add_argument("--output", type=Path, default=ROOT / "web/data")
     args = parser.parse_args()
     build(args.source.resolve(), args.output.resolve())
