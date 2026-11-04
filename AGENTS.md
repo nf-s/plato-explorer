@@ -6,7 +6,7 @@ These instructions apply to work in Plato Explorer. Start with the [project hand
 
 - Never use the Sites feature. Create new projects as local Git repositories.
 - Deploy only when the user explicitly requests deployment and specifies or agrees to the destination.
-- For Plato Explorer, publish source to GitHub. Keep downloaded SEP materials, generated corpus files, article screenshots, build reports, browser snapshots and deployment credentials out of Git and releases. Show the app and sidebar in README screenshots. Omit SEP article prose, including the surrounding text of Mentions results. See the [copyright notice](COPYRIGHT.md).
+- For Plato Explorer, publish source to GitHub. Keep downloaded SEP materials, generated corpus files, article screenshots, build reports, browser snapshots and deployment credentials out of Git and releases. Show the app and sidebar in README screenshots. README screenshots may show a brief, readable excerpt to illustrate a feature. Credit the entry and its author beside the screenshots. See the [copyright notice](COPYRIGHT.md).
 
 Keep the README focused on the explorer, screenshots, local setup and copyright. Keep handoff and release notes in `docs/`. Omit links to the deployed app from the repository.
 

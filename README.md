@@ -4,13 +4,17 @@ Explore how articles in the Stanford Encyclopedia of Philosophy mention people a
 
 ![The home screen with the encyclopedia network and no node selected](docs/screenshots/home.png)
 
-With all node types and common terms included and the minimum set to one mention, **Love** has 624 neighbours, from _Friendship_ to _Saint Augustine_. Select it to see how often the articles mention each other and which ones the SEP lists as related entries.
+Select **Love** to see its 164 neighbours under the default filters. The sidebar shows mentions in both directions and identifies articles the SEP lists as related entries.
 
-![Love with its complete network and the connected articles in the sidebar](docs/screenshots/love.png)
+![Love selected on a laptop, with default filters and the article details sidebar open](docs/screenshots/love.png)
 
-Select **Music**, find **Confucius** in the sidebar, and choose **Mentions**. The 18 results each open the Confucius entry at the highlighted sentence. The screenshot shows the matched words and omits the surrounding article text.
+Select **Music** and find **Confucius** in the sidebar. Choose **Mentions** to see the 18 passages where the Confucius entry mentions music. Selecting a passage takes you to that sentence in the article.
 
-![Music’s full network with the Music and Confucius Mentions panel open](docs/screenshots/music.png)
+![Music selected with the Confucius connection and its Mentions button in the sidebar](docs/screenshots/music.png)
+
+![The first Music and Confucius passage with the word “music” highlighted and a link to the introduction](docs/screenshots/mentions.png)
+
+The brief excerpts in these screenshots are from the _Stanford Encyclopedia of Philosophy_. [“Love” by Bennett Helm](https://plato.stanford.edu/entries/love/) · [“Confucius” by Mark Csikszentmihalyi](https://plato.stanford.edu/entries/confucius/)
 
 ## Run locally
 

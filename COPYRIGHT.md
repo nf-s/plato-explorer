@@ -2,7 +2,7 @@
 
 The [MIT License](LICENSE) applies to Plato Explorer's original code and accompanying documentation. The license grants no rights to the SEP corpus or other third-party material.
 
-**This repository excludes the Stanford Encyclopedia of Philosophy corpus.** It contains the application, build scripts, matching rules, tests and screenshots of the explorer interface. The source dataset, article text, generated graph files, search index, and build reports are excluded from Git.
+**This repository excludes the Stanford Encyclopedia of Philosophy corpus.** It contains the application, build scripts, matching rules, tests and screenshots of the explorer interface. A few lines from the Love and Confucius entries appear in the README screenshots, with the authors credited there. Source datasets, full entries, generated graph files, the search index and build reports are excluded from Git.
 
 The authors of individual SEP entries generally retain copyright in their work. The Metaphysics Research Lab at Stanford University holds copyright in the Stanford Encyclopedia of Philosophy as a whole. Plato Explorer is an independent project with no affiliation with or endorsement by Stanford University or the SEP. [SEP copyright information](https://plato.stanford.edu/info.html#c)
 
