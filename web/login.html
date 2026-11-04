@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Sign in · Plato Explorer</title>
+    <link rel="stylesheet" href="/login.css" />
+    <script defer src="/login.js"></script>
+  </head>
+  <body>
+    <main class="login-card">
+      <h1>Plato Explorer</h1>
+      <p>Sign in with an account that has been granted access.</p>
+      <p id="login-message" class="login-message" role="status" hidden></p>
+      <section
+        id="enrollment-details"
+        class="enrollment-details"
+        hidden
+        aria-labelledby="enrollment-title"
+      >
+        <h2 id="enrollment-title">Account approval</h2>
+        <p>Give these details to the administrator to approve this account.</p>
+        <label for="enrollment-email">Email</label>
+        <input id="enrollment-email" type="text" readonly />
+        <label for="enrollment-subject">Google account ID</label>
+        <input id="enrollment-subject" type="text" readonly />
+        <button id="copy-enrollment" type="button" class="login-button">
+          Copy approval details
+        </button>
+        <p id="enrollment-status" role="status"></p>
+      </section>
+      <a
+        id="google-login"
+        class="login-button"
+        href="/auth/google/start?next=%2F"
+        >Continue with Google</a
+      >
+    </main>
+  </body>
+</html>

@@ -1,0 +1,293 @@
+{
+  "blocked": {
+    "david": ["David"],
+    "elias": ["Elias"]
+  },
+  "excludedPhrases": [
+    "Aufredo Gonteri Brito",
+    "Augustin Prichard",
+    "Ayanna De’Vante Spencer",
+    "Barbara Scholz",
+    "Benjamin Peirce",
+    "Bonhomme Brito",
+    "Brito Vieira",
+    "Bruce Reichenbach",
+    "Cardona Suárez",
+    "Catherine Arnauld",
+    "Charles B. Schmitt",
+    "Daniel Spencer",
+    "Debian L. Marty",
+    "E. Glen Weyl",
+    "Edith Rosenzweig",
+    "Edna Suárez-Díaz",
+    "Fanny Mendelssohn",
+    "Felix Mendelssohn",
+    "first Earl of Shaftesbury",
+    "Francis Masham",
+    "Frederick Schmitt",
+    "G. Spencer Brown",
+    "Glen Weyl",
+    "Gottlieb Schlick",
+    "Guillaume Arnauld",
+    "Jack Spencer",
+    "Jasper Reid",
+    "Joel Spencer",
+    "John Murdoch",
+    "John Scotus Eriugena",
+    "Kevin Scharp",
+    "L. Marty",
+    "Le Grand Arnauld",
+    "Leslie Leibowitz",
+    "Louis Arnauld",
+    "Louis Arnauld Reid",
+    "Louis le Grand",
+    "Luther King",
+    "Luther Lee Bernard",
+    "Lydian Emerson",
+    "Manfred Schmitt",
+    "Marcelo Levinas",
+    "Maria Reichenbach",
+    "Martin Luther King",
+    "Mary Moody Emerson",
+    "Mary Wollstonecraft Godwin",
+    "Mendelssohn Hensel",
+    "Monica Brito Vieira",
+    "Philippa Ruth Bosanquet",
+    "President Poincaré",
+    "Ps.-Robert Kilwardby",
+    "Pseudo-Robert Kilwardby",
+    "Quayshawn Spencer",
+    "Raimundo de Farias Brito",
+    "Raymond Poincaré",
+    "Roy Sellars",
+    "Roy Wood Sellars",
+    "Sally Scholz",
+    "Scotus Eriugena",
+    "Sextus Tarquinius",
+    "Spencer Roane",
+    "Stephen David Ross",
+    "Suárez-Díaz",
+    "Suarez-Nani",
+    "Sylvan Bromberger",
+    "Tiziana Suarez-Nani",
+    "Addison-Wesley",
+    "Addison Wesley",
+    "Jung Juda",
+    "Esaias Pufendorf",
+    "Shen Dao",
+    "Wang Dao",
+    "Shan Tao",
+    "Dao Qian",
+    "Tao Hongjing",
+    "Tao Honjing",
+    "Green-Tao theorem",
+    "Opera omnia",
+    "Opera philosophica",
+    "Opera theologica",
+    "Opera latina",
+    "Opera mathematica",
+    "Opera posthuma",
+    "Opera logica",
+    "Opera cum Averrois Commentariis",
+    "Omnia opera",
+    "Opera I",
+    "Opera II",
+    "Opera III",
+    "Opera V",
+    "Opera VI",
+    "posthumous Opera",
+    "magna opera",
+    "opera divina",
+    "opera supererogationis",
+    "experimenta and opera",
+    "space opera",
+    "soap operas",
+    "Sydney Opera House",
+    "Opera, 5 vols",
+    "Opera, III",
+    "Great Depression",
+    "economic depression",
+    "respiratory depression",
+    "inbreeding depression",
+    "depression of the gas pedal",
+    "depression of freezing point",
+    "cultural depression",
+    "Pride and Prejudice",
+    "end of the Depression",
+    "during the Depression",
+    "height of the depression",
+    "followed by a depression",
+    "compressions and depressions"
+  ],
+  "contextual": {
+    "person-carl-jung": {
+      "aliases": ["Jung"],
+      "blockers": [
+        "Elżbieta Jung",
+        "Jung, Elżbieta",
+        "Jung, E.",
+        "Jung-Palczewska",
+        "Achim Jung",
+        "Jung, Achim",
+        "Matthias Jung",
+        "Jung, Matthias",
+        "Courtney Jung",
+        "Jung, Courtney",
+        "Jung-Yeup",
+        "Emma Jung",
+        "Joachim Jung",
+        "Hwa Yol Jung",
+        "Jung, Hwa Yol",
+        "Jung, K. W."
+      ]
+    },
+    "burke": {
+      "aliases": ["Burke"],
+      "blockers": [
+        "Kenneth Burke",
+        "Burke, Kenneth",
+        "Burke, K.",
+        "Peter Burke",
+        "Burke, Peter",
+        "Michael Burke",
+        "Burke, Michael"
+      ]
+    },
+    "shaftesbury": {
+      "aliases": ["Shaftesbury", "Lord Shaftesbury", "Earl of Shaftesbury"],
+      "blockers": [
+        "first Earl of Shaftesbury",
+        "1st Earl of Shaftesbury",
+        "First Earl, Shaftesbury",
+        "Lord Ashley"
+      ]
+    },
+    "person-joseph-addison": {
+      "aliases": ["Addison"],
+      "blockers": [
+        "John Addison",
+        "John Willard Addison",
+        "Addison, John",
+        "J. W. Addison",
+        "Addison, J. W.",
+        "J.W. Addison",
+        "Addison, J.W."
+      ]
+    },
+    "person-sigmund-freud": {
+      "aliases": ["Freud"],
+      "blockers": ["Anna Freud"]
+    },
+    "person-hilary-putnam": {
+      "aliases": ["Putnam"],
+      "blockers": [
+        "Robert Putnam",
+        "Robert D. Putnam",
+        "Putnam, Robert",
+        "Ruth Anna Putnam",
+        "Putnam, Ruth Anna",
+        "Putnam, R.A.",
+        "Putnam, R. A.",
+        "Daniel Putnam"
+      ]
+    },
+    "person-gayatri-spivak": {
+      "aliases": ["Spivak"],
+      "blockers": ["Spivak, M.", "Spivak, D."]
+    },
+    "person-martha-nussbaum": {
+      "aliases": ["Nussbaum"],
+      "blockers": [
+        "Charles Nussbaum",
+        "Charles O. Nussbaum",
+        "Nussbaum, Charles",
+        "Nussbaum, C."
+      ]
+    },
+    "person-susan-sontag": {
+      "aliases": ["Sontag"],
+      "blockers": ["Sontag, E."]
+    },
+    "person-alasdair-macintyre": {
+      "aliases": ["MacIntyre"],
+      "blockers": [
+        "Angus Macintyre",
+        "Macintyre, Angus",
+        "Ben Macintyre",
+        "Macintyre, Ben",
+        "Macintyre, A.J.",
+        "Macintyre, A. J."
+      ]
+    },
+    "person-mary-midgley": {
+      "aliases": ["Midgley"],
+      "blockers": [
+        "Clare Midgley",
+        "Midgley, Clare",
+        "Midgley, G. C. J.",
+        "Midgley, G.C.J."
+      ]
+    },
+    "person-david-chalmers": {
+      "aliases": ["Chalmers"],
+      "blockers": [
+        "Alan Chalmers",
+        "Chalmers, Alan",
+        "Chalmers, A.",
+        "Chalmers, A.F.",
+        "Chalmers, A. F.",
+        "Chalmers, J.",
+        "Chalmers, W. R.",
+        "Chalmers, I.",
+        "Chalmers, M."
+      ]
+    },
+    "person-jerry-fodor": {
+      "aliases": ["Fodor"],
+      "blockers": [
+        "Janet Dean Fodor",
+        "Fodor, Janet Dean",
+        "Fodor, J.D.",
+        "Fodor, J. D."
+      ]
+    },
+    "person-timothy-williamson": {
+      "aliases": ["Williamson"],
+      "blockers": [
+        "Joel Williamson",
+        "Williamson, Joel",
+        "Jon Williamson",
+        "Williamson, Jon",
+        "Oliver Williamson",
+        "Oliver E. Williamson",
+        "Williamson, Oliver",
+        "Williamson, O.",
+        "Williamson, J.",
+        "Williamson, P.",
+        "Williamson, Diane",
+        "Williamson, A.",
+        "Williamson, Thad",
+        "Williamson, Amanda"
+      ]
+    },
+    "person-david-bohm": {
+      "aliases": ["Bohm"],
+      "blockers": [
+        "Tobias Böhm",
+        "Böhm, T.",
+        "Böhm, Franz",
+        "Franz Böhm",
+        "Böhm, A.",
+        "S. Böhm"
+      ]
+    },
+    "keyword-depression": {
+      "aliases": ["Depression"],
+      "blockers": ["Great Depression", "economic depression"]
+    },
+    "keyword-dao": {
+      "aliases": ["Tao"],
+      "blockers": ["Terence Tao", "Green-Tao"]
+    }
+  }
+}

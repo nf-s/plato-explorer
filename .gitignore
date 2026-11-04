@@ -1,0 +1,28 @@
+# Local SEP downloads and generated material (including alternate output paths).
+/[Dd]ata/
+/web/data/
+*.parquet
+*.jsonl
+*.csv
+graph.json
+build-report.json
+keyword-report.json
+word-frequencies.json
+articles/
+search/
+.artifacts/
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# Local environments, credentials, and live Cloudflare configuration.
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+.dev.vars*
+.env*
+.wrangler/
+/wrangler.jsonc
+client_secret*.json
+.DS_Store

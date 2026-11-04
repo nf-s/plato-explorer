@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Plato" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta
+      name="description"
+      content="Browse articles and connections in the Stanford Encyclopedia of Philosophy."
+    />
+    <title>Plato Explorer</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./icons/apple-touch-icon.png"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <main class="workspace">
+      <section class="graph-panel" aria-label="Encyclopedia network">
+        <div class="graph-toolbar">
+          <div class="view-toggle" role="group" aria-label="Display mode">
+            <button id="network-mode" class="active" aria-pressed="true">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="m5 5 10 3-7 8L5 5" />
+                <circle cx="5" cy="5" r="2.5" />
+                <circle cx="15" cy="8" r="2.5" />
+                <circle cx="8" cy="16" r="2.5" /></svg
+              >Network</button
+            ><button id="list-mode" aria-pressed="false">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M6 5h11M6 10h11M6 15h11M2 5h1M2 10h1M2 15h1" /></svg
+              >List
+            </button>
+          </div>
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 4.5 4.5" />
+            </svg>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search nodes and article text…"
+              aria-label="Search nodes and article text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded="false"
+              aria-controls="search-results"
+              autocomplete="off"
+              maxlength="200"
+              spellcheck="false"
+            />
+            <kbd class="search-shortcut">/</kbd>
+            <div
+              id="search-results"
+              class="search-results"
+              role="listbox"
+              hidden
+            ></div>
+          </div>
+
+          <button
+            id="filters-button"
+            class="filter-toggle quiet-button"
+            aria-expanded="false"
+            aria-controls="filters"
+          >
+            Filters <span id="filter-count" hidden></span
+            ><svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M3 6h14M3 14h14M7 3v6M13 11v6" />
+            </svg>
+          </button>
+        </div>
+        <div id="filters" class="filters" hidden>
+          <div class="panel-header">
+            <button id="filters-close" class="quiet-button">
+              ← Back to graph
+            </button>
+            <h2>Filters</h2>
+          </div>
+          <fieldset class="node-kind-filters">
+            <legend>Show nodes</legend>
+            <label class="checkbox-label"
+              ><input id="show-person" type="checkbox" checked /> People</label
+            >
+            <label class="checkbox-label"
+              ><input id="show-topic" type="checkbox" checked /> Topics</label
+            >
+            <label class="checkbox-label"
+              ><input id="show-keyword" type="checkbox" /> Keywords</label
+            >
+          </fieldset>
+          <label for="colour-mode"
+            >Colour by<select id="colour-mode">
+              <option value="subject">Subject (estimated)</option>
+              <option value="type">Node type</option>
+              <option value="connections">Connection count</option>
+              <option value="neutral">No categories</option>
+            </select></label
+          >
+          <label class="checkbox-label"
+            ><input id="hide-common" type="checkbox" checked /> Hide common-term
+            mentions</label
+          >
+          <p class="filter-explanation">
+            Exclude inferred mentions of terms found in over half the articles.
+            Related-entry links stay visible.
+          </p>
+          <details class="common-terms">
+            <summary id="common-terms-summary">Common terms</summary>
+            <p id="common-terms-list"></p>
+          </details>
+          <label for="link-type"
+            >Connection type<select id="link-type">
+              <option value="all">All connections</option>
+              <option value="mentions">Text mentions</option>
+              <option value="related">Related entries</option>
+            </select></label
+          >
+          <label for="min-mentions"
+            >Minimum mentions <output id="min-mentions-value">5</output
+            ><input id="min-mentions" type="range" min="1" max="50" value="5"
+          /></label>
+          <label class="checkbox-label"
+            ><input id="show-labels" type="checkbox" checked /> Node
+            labels</label
+          >
+          <button id="reset-filters" class="text-button">Reset filters</button>
+        </div>
+        <div class="graph-heading">
+          <div class="heading-row">
+            <button
+              id="reset-view"
+              class="quiet-button"
+              hidden
+              aria-label="Back to overview"
+            >
+              ←
+            </button>
+            <h1 id="graph-title">People · Topics</h1>
+          </div>
+        </div>
+        <div id="legend-panel" aria-label="Graph legend">
+          <div class="panel-header">
+            <h2>Legend</h2>
+            <button
+              id="legend-close"
+              class="quiet-button"
+              aria-label="Close legend"
+            >
+              ×
+            </button>
+          </div>
+          <details class="colour-legend">
+            <summary id="colour-label">Subjects</summary>
+            <div id="colour-legend"></div>
+          </details>
+          <div class="scale-legend">
+            <span class="node-key"><i></i><i></i></span>More mentions
+            <span class="line-key"></span>Stronger connection
+          </div>
+        </div>
+        <canvas
+          id="graph"
+          tabindex="0"
+          aria-label="Encyclopedia network. Drag to pan, scroll to zoom. Use search or the List view to select nodes with a keyboard."
+        ></canvas>
+        <div id="article-list" class="article-list" hidden>
+          <div class="list-heading">
+            <span>Node</span><span>Incoming mentions</span>
+          </div>
+          <div id="article-list-rows"></div>
+          <button id="more-articles" class="secondary-button">
+            Show more nodes
+          </button>
+        </div>
+        <div id="graph-tooltip" class="graph-tooltip" hidden></div>
+        <div id="firefox-notice" class="firefox-notice" role="status" hidden>
+          <span
+            >Firefox may render large graphs slowly. Try increasing minimum
+            mentions or using Chrome.</span
+          >
+          <button
+            id="firefox-notice-close"
+            aria-label="Dismiss Firefox performance notice"
+          >
+            ×
+          </button>
+        </div>
+        <div id="loading" class="loading">
+          <span class="spinner"></span
+          ><span>Loading articles and connections</span>
+        </div>
+        <div id="graph-empty" class="graph-empty" hidden>
+          No connections match these filters.<button
+            id="empty-reset"
+            class="text-button"
+          >
+            Reset filters
+          </button>
+        </div>
+        <div class="graph-bottom">
+          <div class="graph-controls">
+            <div
+              class="history-controls"
+              role="group"
+              aria-label="Navigation history"
+            >
+              <button id="history-back" aria-label="Back" title="Back" disabled>
+                ←
+              </button>
+              <button
+                id="history-forward"
+                aria-label="Forward"
+                title="Forward"
+                disabled
+              >
+                →
+              </button>
+            </div>
+            <div class="zoom-controls" role="group" aria-label="Graph controls">
+              <button id="zoom-in" aria-label="Zoom in">+</button
+              ><button id="zoom-out" aria-label="Zoom out">−</button
+              ><span></span
+              ><button id="fit-view" aria-label="Fit graph to view">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4" />
+                </svg>
+              </button>
+              <button
+                id="legend-toggle"
+                aria-label="Legend"
+                title="Legend"
+                aria-controls="legend-panel"
+                aria-expanded="false"
+              >
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <circle cx="4" cy="5" r="1" />
+                  <circle cx="4" cy="10" r="1" />
+                  <circle cx="4" cy="15" r="1" />
+                  <path d="M8 5h9M8 10h9M8 15h9" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button
+            id="details-open"
+            class="secondary-button"
+            aria-controls="inspector"
+            aria-expanded="false"
+          >
+            Details
+          </button>
+        </div>
+        <div class="graph-status">
+          <span id="visible-count">Preparing graph</span
+          ><span id="layout-label">Nodes sized by incoming mentions</span>
+        </div>
+      </section>
+
+      <aside id="inspector" class="inspector" aria-label="Node details">
+        <div class="inspector-mobile-header">
+          <button id="details-close" class="quiet-button">
+            ← Back to graph
+          </button>
+        </div>
+        <div id="inspector-scroll" class="inspector-scroll">
+          <div class="inspector-content" id="inspector-content"></div>
+          <div class="source-footer">
+            <div class="account-controls">
+              <button id="about-button" class="quiet-button">
+                About &amp; copyright
+              </button>
+            </div>
+            <span>SEP articles © their authors</span
+            ><a
+              href="https://plato.stanford.edu/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open Stanford Encyclopedia of Philosophy"
+              >↗</a
+            >
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <dialog id="reader" class="reader-dialog" aria-labelledby="reader-title">
+      <div class="reader-topbar">
+        <button id="reader-close" class="quiet-button">← Back</button>
+        <button
+          id="reader-contents-button"
+          class="quiet-button"
+          aria-haspopup="dialog"
+          aria-controls="reader-contents-dialog"
+          aria-expanded="false"
+          disabled
+        >
+          Contents
+        </button>
+        <a
+          id="reader-original"
+          class="quiet-button"
+          target="_blank"
+          rel="noreferrer"
+          >Original on SEP ↗</a
+        >
+      </div>
+      <div class="reader-layout">
+        <nav
+          id="reader-toc"
+          class="reader-toc"
+          aria-label="Article contents"
+        ></nav>
+        <article class="reader-article">
+          <h1 id="reader-title"></h1>
+          <div id="reader-content"></div>
+        </article>
+      </div>
+      <dialog
+        id="reader-contents-dialog"
+        aria-labelledby="reader-contents-title"
+      >
+        <div class="reader-contents-header">
+          <h2 id="reader-contents-title">Contents</h2>
+          <button id="reader-contents-close" class="quiet-button">Close</button>
+        </div>
+      </dialog>
+    </dialog>
+
+    <dialog id="about" class="about-dialog" aria-labelledby="about-title">
+      <button
+        id="about-close"
+        class="dialog-close"
+        aria-label="Close about dialog"
+      >
+        ×
+      </button>
+      <h2 id="about-title">About the graph</h2>
+      <h3>Copyright and attribution</h3>
+      <p>
+        Article text © the respective authors. The Stanford Encyclopedia of
+        Philosophy © Metaphysics Research Lab, Stanford University. All rights
+        reserved. Available author credits and links to the original articles
+        are retained in the reader.
+      </p>
+      <p>
+        This visualization is independent and is not affiliated with or endorsed
+        by Stanford University or the Stanford Encyclopedia of Philosophy.
+        <a
+          href="https://plato.stanford.edu/info.html#c"
+          target="_blank"
+          rel="noreferrer"
+          >SEP copyright information and terms of use</a
+        >.
+      </p>
+      <h3>Nodes and connections</h3>
+      <p>
+        Larger nodes have more incoming mentions. Thicker lines have more
+        mentions between the two articles. Dashed lines are related-entry links
+        without visible text mentions. Counts and sizes reflect the common-term
+        filter.
+      </p>
+      <p>
+        In the connection list, “out” counts mentions in the selected article;
+        “in” counts mentions of it in the other article.
+      </p>
+      <h3>Common-term filter</h3>
+      <p>
+        Enabled by default. It hides inferred mentions of article titles
+        appearing in more than half the corpus. This reduces generic connections
+        to terms such as Time, Object, and Life. Explicit related-entry links
+        are preserved. Turn it off in Filters to restore every mention.
+      </p>
+      <h3>People and colours</h3>
+      <p>
+        People, Topics, and Keywords can be shown independently. The selected
+        node stays visible regardless of these filters. People without a
+        dedicated article and extracted keywords link to passages in the
+        articles that mention them. Subject colours are approximate labels
+        inferred from titles, introductions, and related entries; they are not
+        SEP categories. Node type and connection count are alternative colour
+        modes.
+      </p>
+      <h3>Mentions</h3>
+      <p>
+        Select an article, then Shift-click a connected node or use its Mentions
+        button. Passages show the actual matches from each available source
+        article.
+      </p>
+      <h3>Full-text search</h3>
+      <p>
+        Search matches all entered words anywhere in an article, ignoring case
+        and accents. Text results cover every article regardless of graph
+        filters. Select a result to read its matching passage.
+      </p>
+      <h3>Data</h3>
+      <p id="about-data"></p>
+      <p>
+        Matching uses whole-word article titles and curated name aliases. It
+        ignores case and excludes self-mentions, headings, contents lists, and
+        bibliographies. A match can be ambiguous; it does not imply agreement or
+        a citation.
+      </p>
+      <p>
+        The reader retains all detected links, including common terms. Article
+        text is a local snapshot and may differ from the current encyclopedia.
+      </p>
+      <a
+        href="https://plato.stanford.edu/"
+        target="_blank"
+        rel="noreferrer"
+        class="text-button"
+        >Stanford Encyclopedia of Philosophy ↗</a
+      >
+    </dialog>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></div>
+  </body>
+</html>
