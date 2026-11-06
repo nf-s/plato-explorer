@@ -1037,22 +1037,19 @@ dialog::backdrop {
   font-size: 17px;
 }
 #reader-content a {
-  color: #466572;
-  text-decoration-color: #a4a8ae;
+  color: #245ca4;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-#reader-content a:hover {
-  background: #ecf0f6;
+#reader-content a:hover,
+#reader-content a:focus-visible {
+  color: #18477f;
+  background: #edf3fb;
+  text-decoration-thickness: 2px;
 }
-#reader-content .article-mention {
-  color: #365e70;
-  text-decoration: none;
-}
-#reader-content .article-mention:hover,
-#reader-content .article-mention:focus-visible {
-  text-decoration: underline;
-  text-decoration-color: #a4b5bd;
-  text-decoration-thickness: 1px;
+#reader-content a[data-article] {
+  -webkit-touch-callout: none;
 }
 #reader-content .reader-passage-highlight {
   background: #edf2f4;
@@ -1089,6 +1086,73 @@ dialog::backdrop {
     sans-serif;
   color: var(--muted);
   font-size: 13px;
+}
+.article-preview {
+  position: fixed;
+  z-index: 2;
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(640px, calc(100dvh - 24px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 10px 36px #1d293929;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.article-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.article-preview-header h2 {
+  margin: 8px 0 0;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.article-preview-header .quiet-button {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+}
+.article-preview-excerpt {
+  margin: 0 0 12px;
+  color: #4c5056;
+}
+.article-preview-credit,
+.article-preview-status {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.article-preview-connections {
+  margin-top: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+.article-preview-connections p {
+  margin: 0 0 5px;
+}
+.article-preview-connections p:last-child {
+  margin-bottom: 0;
+}
+.article-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.article-preview-actions button {
+  flex: 1;
+  min-height: 44px;
 }
 @media (min-width: 1600px) {
   .workspace {

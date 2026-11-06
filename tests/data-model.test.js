@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   commonTermIndices,
+  connectionBetween,
   connections,
   createIndex,
   edgeMatches,
@@ -122,6 +123,83 @@ test("incoming and outgoing counts reverse correctly from either endpoint", () =
   assert.equal(left.weight, right.weight);
   assert.equal(left.relatedIn, true);
   assert.equal(right.relatedOut, true);
+});
+
+test("pair lookup preserves full mention counts and direction without applying graph filters", () => {
+  const graph = fixture();
+  graph.nodes[0].references = 2;
+  const index = createIndex(graph);
+  assert.deepEqual(
+    connectionBetween(graph, index, "nietzsche", "human-nature"),
+    {
+      outgoing: 3,
+      incoming: 6,
+      relatedOut: false,
+      relatedIn: true,
+      weight: 9,
+    },
+  );
+  assert.deepEqual(
+    connectionBetween(graph, index, "human-nature", "nietzsche"),
+    {
+      outgoing: 6,
+      incoming: 3,
+      relatedOut: true,
+      relatedIn: false,
+      weight: 9,
+    },
+  );
+});
+
+test("pair lookup retains related-only connections and rejects absent endpoints and pairs", () => {
+  const graph = fixture();
+  const index = createIndex(graph);
+  assert.deepEqual(connectionBetween(graph, index, "nietzsche", "descartes"), {
+    outgoing: 0,
+    incoming: 0,
+    relatedOut: true,
+    relatedIn: false,
+    weight: 0,
+  });
+  assert.deepEqual(connectionBetween(graph, index, "descartes", "nietzsche"), {
+    outgoing: 0,
+    incoming: 0,
+    relatedOut: false,
+    relatedIn: true,
+    weight: 0,
+  });
+  for (const [source, target] of [
+    ["missing", "nietzsche"],
+    ["nietzsche", "missing"],
+    ["nietzsche", "nietzsche"],
+    ["human-nature", "descartes"],
+  ])
+    assert.equal(connectionBetween(graph, index, source, target), null);
+});
+
+test("pair lookup counts mentions of synthetic nodes without inventing reverse mentions", () => {
+  const graph = syntheticFixture();
+  const index = createIndex(graph);
+  assert.deepEqual(
+    connectionBetween(graph, index, "nietzsche", "keyword-music"),
+    {
+      outgoing: 5,
+      incoming: 0,
+      relatedOut: false,
+      relatedIn: false,
+      weight: 5,
+    },
+  );
+  assert.deepEqual(
+    connectionBetween(graph, index, "keyword-music", "nietzsche"),
+    {
+      outgoing: 0,
+      incoming: 5,
+      relatedOut: false,
+      relatedIn: false,
+      weight: 5,
+    },
+  );
 });
 
 test("related-only connections survive the default filter and no mention counts are invented", () => {

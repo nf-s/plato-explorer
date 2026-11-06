@@ -1,4 +1,5 @@
 import { element, validateArticle } from "./data-model.js";
+import { ArticlePreview } from "./article-preview.js";
 
 function validHighlight(block, highlight) {
   return (
@@ -73,7 +74,9 @@ export class ArticleReader {
     this.location = null;
     this.cache = new Map();
     this.controller = null;
+    this.preview = new ArticlePreview(this);
     this.contentsButton.addEventListener("click", () => {
+      this.preview.hide();
       this.contentsButton.focus({ preventScroll: true });
       this.contentsDialog.append(this.toc);
       this.contentsDialog.showModal();
@@ -93,7 +96,10 @@ export class ArticleReader {
       .getElementById("reader-close")
       .addEventListener("click", () => this.close());
     this.dialog.addEventListener("close", () => {
-      if (!this.dialog.open) this.controller?.abort();
+      if (!this.dialog.open) {
+        this.controller?.abort();
+        this.preview.hide();
+      }
     });
     this.dialog.addEventListener("cancel", (event) => {
       event.preventDefault();
@@ -131,6 +137,7 @@ export class ArticleReader {
   }
 
   dismiss() {
+    this.preview.hide();
     this.closeContents();
     this.controller?.abort();
     this.dialog.close();
@@ -168,6 +175,7 @@ export class ArticleReader {
   }
 
   async show(node, blockIndex = null, highlight = null) {
+    this.preview.hide();
     this.closeContents();
     this.contentsButton.disabled = true;
     this.controller?.abort();
@@ -277,7 +285,7 @@ export class ArticleReader {
         if (part.target) {
           parent.href = `#/${encodeURIComponent(part.target)}`;
           parent.dataset.article = part.target;
-          parent.title = "Explore this article’s connections";
+          parent.setAttribute("aria-keyshortcuts", "ArrowDown");
         }
         for (const segment of part.segments)
           parent.append(
@@ -316,6 +324,7 @@ export class ArticleReader {
           if (related.id) {
             anchor.href = `#/${encodeURIComponent(related.id)}`;
             anchor.dataset.article = related.id;
+            anchor.setAttribute("aria-keyshortcuts", "ArrowDown");
           } else {
             anchor.href = related.url;
             anchor.target = "_blank";

@@ -989,7 +989,7 @@ async function start() {
     reducedIndex = createIndex(reducedGraph);
     graph = reducedGraph;
     index = reducedIndex;
-    reader = new ArticleReader(graph, (id) => {
+    reader = new ArticleReader(sourceGraph, (id) => {
       const nodeIndex = index.byId.get(id);
       if (nodeIndex !== undefined) navigate(nodeIndex);
     });

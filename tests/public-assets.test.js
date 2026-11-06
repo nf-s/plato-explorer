@@ -54,6 +54,7 @@ test("public staging contains the app and data without private account assets or
     "index.html",
     "app.js",
     "navigation.js",
+    "article-preview.js",
     "manifest.webmanifest",
     "icons/icon.svg",
     "icons/apple-touch-icon.png",

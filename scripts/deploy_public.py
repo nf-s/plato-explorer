@@ -15,6 +15,7 @@ PUBLIC_FILES = (
     "data-model.js",
     "navigation.js",
     "reader.js",
+    "article-preview.js",
     "evidence.js",
     "categories.js",
     "full-text-search.js",

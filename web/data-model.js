@@ -255,6 +255,31 @@ export function nodeMatches(node, filters) {
   return filters.kinds?.[node.kind] !== false;
 }
 
+function connectionCounts(edge, selected) {
+  const isSource = edge[0] === selected;
+  return {
+    outgoing: isSource ? edge[2] : edge[3],
+    incoming: isSource ? edge[3] : edge[2],
+    relatedOut: Boolean(isSource ? edge[4] : edge[5]),
+    relatedIn: Boolean(isSource ? edge[5] : edge[4]),
+    weight: edge[2] + edge[3],
+  };
+}
+
+export function connectionBetween(graph, index, sourceId, targetId) {
+  const source = index.byId.get(sourceId);
+  const target = index.byId.get(targetId);
+  if (source === undefined || target === undefined || source === target)
+    return null;
+  const edgeIndex = index.adjacency[source].find((candidate) => {
+    const edge = graph.edges[candidate];
+    return edge[0] === target || edge[1] === target;
+  });
+  return edgeIndex === undefined
+    ? null
+    : connectionCounts(graph.edges[edgeIndex], source);
+}
+
 export function connections(graph, index, selected, filters) {
   return index.adjacency[selected]
     .map((edgeIndex) => {
@@ -263,11 +288,7 @@ export function connections(graph, index, selected, filters) {
       return {
         index: isSource ? edge[1] : edge[0],
         edgeIndex,
-        outgoing: isSource ? edge[2] : edge[3],
-        incoming: isSource ? edge[3] : edge[2],
-        relatedOut: Boolean(isSource ? edge[4] : edge[5]),
-        relatedIn: Boolean(isSource ? edge[5] : edge[4]),
-        weight: edge[2] + edge[3],
+        ...connectionCounts(edge, selected),
       };
     })
     .filter(

@@ -7,6 +7,6 @@
   "scripts": {
     "start": "python3 scripts/serve.py",
     "test": "node --test tests/*.test.js worker/auth/*.test.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
-    "check": "node --check web/app.js && node --check web/navigation.js && node --check web/graph-view.js && node --check web/data-model.js && node --check web/reader.js && node --check web/evidence.js && node --check web/categories.js && node --check web/account.js && node --check worker/index.mjs && node --check web/full-text-search.js"
+    "check": "node --check web/app.js && node --check web/navigation.js && node --check web/graph-view.js && node --check web/data-model.js && node --check web/reader.js && node --check web/article-preview.js && node --check web/evidence.js && node --check web/categories.js && node --check web/account.js && node --check worker/index.mjs && node --check web/full-text-search.js"
   }
 }
