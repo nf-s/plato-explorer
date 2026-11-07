@@ -277,3 +277,63 @@ test("deployment routes every asset through the private Worker gate", async () =
   assert.equal(config.preview_urls, false);
   assert.equal(config.observability.logs.invocation_logs, false);
 });
+
+test("analytics is hostname-scoped HTML only and does not bypass the private gate", async () => {
+  const h = setup();
+  const html = "<html><body>Private app</body></html>";
+  h.env.ASSETS.fetch = async () =>
+    new Response(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  const origin = "https://plato-explorer.nf-s.workers.dev";
+  const login = await worker.fetch(new Request(`${origin}/login`), h.env);
+  const body = await login.text();
+  assert.equal((body.match(/data-cf-beacon/g) ?? []).length, 1);
+  assert.match(body, /830982296f06491d8f8d4205079e2c48/);
+  assert.doesNotMatch(body, /093e6d9f987841e0b171941b176ea5d7/);
+  assertPrivateHeaders(login);
+  const policy = login.headers.get("Content-Security-Policy");
+  assert.match(
+    policy,
+    /script-src 'self' https:\/\/static\.cloudflareinsights\.com;/,
+  );
+  assert.match(policy, /connect-src 'self' https:\/\/cloudflareinsights\.com;/);
+  assert.match(
+    policy,
+    /object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'/,
+  );
+  const other = await worker.fetch(request("/login"), h.env);
+  assert.equal(await other.text(), html);
+  const head = await worker.fetch(
+    new Request(`${origin}/login`, { method: "HEAD" }),
+    h.env,
+  );
+  assert.equal(await head.text(), "");
+  h.env.PUBLIC_URL = origin;
+  const denied = await worker.fetch(new Request(`${origin}/index.html`), h.env);
+  assert.equal(denied.status, 401);
+  assert.doesNotMatch(await denied.text(), /data-cf-beacon/);
+  const admin = await h.login();
+  const allowed = await worker.fetch(
+    new Request(`${origin}/`, {
+      headers: { Cookie: `${COOKIE_NAMES.session}=${admin.sessionToken}` },
+    }),
+    h.env,
+  );
+  assert.equal(allowed.status, 200);
+  assert.equal(
+    ((await allowed.text()).match(/data-cf-beacon/g) ?? []).length,
+    1,
+  );
+  h.env.ASSETS.fetch = async () =>
+    new Response(body, { headers: { "Content-Type": "text/html" } });
+  const repeated = await worker.fetch(new Request(`${origin}/login`), h.env);
+  assert.equal(
+    ((await repeated.text()).match(/data-cf-beacon/g) ?? []).length,
+    1,
+  );
+  h.env.ASSETS.fetch = async () =>
+    new Response(html, { headers: { "Content-Type": "application/json" } });
+  const nonHtml = await worker.fetch(new Request(`${origin}/login.js`), h.env);
+  assert.equal(await nonHtml.text(), html);
+});

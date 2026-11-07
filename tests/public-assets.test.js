@@ -26,8 +26,14 @@ test("crawler exclusions cover the entire public site and all data responses", a
   assert.equal(headers.get("X-Content-Type-Options"), "nosniff");
   assert.equal(headers.get("X-Frame-Options"), "DENY");
   const policy = headers.get("Content-Security-Policy");
-  assert.match(policy, /(?:^|; )script-src 'self'(?:;|$)/u);
-  assert.match(policy, /(?:^|; )connect-src 'self'(?:;|$)/u);
+  assert.match(
+    policy,
+    /(?:^|; )script-src 'self' https:\/\/static\.cloudflareinsights\.com(?:;|$)/u,
+  );
+  assert.match(
+    policy,
+    /(?:^|; )connect-src 'self' https:\/\/cloudflareinsights\.com(?:;|$)/u,
+  );
   assert.match(policy, /(?:^|; )frame-ancestors 'none'(?:;|$)/u);
 });
 
@@ -74,6 +80,7 @@ test("public staging contains the app and data without private account assets or
     ),
   );
   const html = await readFile(new URL("index.html", staged), "utf8");
+  assert.doesNotMatch(html, /cloudflareinsights|data-cf-beacon/u);
   assert.doesNotMatch(html, /(?:login|account)\.(?:js|css)/u);
   const app = await readFile(new URL("app.js", staged), "utf8");
   assert.doesNotMatch(app, /initAccount|\/api\/session|\/auth\/google/u);

@@ -6,7 +6,7 @@ function json(value, status = 200) {
   return Response.json(value, { status });
 }
 
-function secure(response, request) {
+async function secure(response, request) {
   const headers = new Headers(response.headers);
   headers.set("Cache-Control", "no-store");
   headers.set("Vary", "Cookie");
@@ -15,9 +15,24 @@ function secure(response, request) {
   headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+    "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
   );
-  return new Response(request.method === "HEAD" ? null : response.body, {
+  let body = request.method === "HEAD" ? null : response.body;
+  // Pages injects its own beacon. Never add the private site's token to shared assets.
+  if (
+    request.method === "GET" &&
+    new URL(request.url).hostname === "plato-explorer.nf-s.workers.dev" &&
+    response.status === 200 &&
+    response.headers.get("Content-Type")?.split(";")[0].trim() === "text/html"
+  ) {
+    const html = await response.text();
+    const beacon = `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"830982296f06491d8f8d4205079e2c48"}'></script>`;
+    body = html.includes("static.cloudflareinsights.com/beacon.min.js")
+      ? html
+      : html.replace("</body>", `${beacon}</body>`);
+    headers.delete("Content-Length");
+  }
+  return new Response(body, {
     status: response.status,
     headers,
   });
@@ -72,7 +87,7 @@ async function route(request, env) {
 export default {
   async fetch(request, env) {
     try {
-      return secure(await route(request, env), request);
+      return await secure(await route(request, env), request);
     } catch {
       return secure(
         json({ error: "The service is temporarily unavailable" }, 503),
