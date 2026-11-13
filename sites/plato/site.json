@@ -1,0 +1,37 @@
+{
+  "id": "plato",
+  "name": "Plato Explorer",
+  "shortName": "Plato",
+  "description": "Browse articles and connections in the Stanford Encyclopedia of Philosophy.",
+  "source": {
+    "name": "Stanford Encyclopedia of Philosophy",
+    "shortName": "SEP",
+    "url": "https://plato.stanford.edu/",
+    "hosts": ["plato.stanford.edu"],
+    "footer": "SEP articles © their authors",
+    "articleRights": "Article copyright remains with its authors. ",
+    "readerNotice": "Stanford Encyclopedia of Philosophy © Metaphysics Research Lab, Stanford University. Unaffiliated visualization. ",
+    "copyrightUrl": "https://plato.stanford.edu/info.html#c"
+  },
+  "about": {
+    "copyright": [
+      "Article text © the respective authors. The Stanford Encyclopedia of Philosophy © Metaphysics Research Lab, Stanford University. All rights reserved. Available author credits and links to the original articles are retained in the reader.",
+      "This visualization is independent and is not affiliated with or endorsed by Stanford University or the Stanford Encyclopedia of Philosophy. "
+    ],
+    "copyrightLink": "SEP copyright information and terms of use",
+    "commonTermExamples": "Time, Object, and Life",
+    "subjectNote": "they are not SEP categories"
+  },
+  "defaults": { "minimumMentions": 5 },
+  "subjects": [
+    ["Ethics & society", "#b97559"],
+    ["Mind & knowledge", "#638f9e"],
+    ["Logic & language", "#7b75a6"],
+    ["Science & mathematics", "#578b76"],
+    ["Metaphysics", "#b29854"],
+    ["Religion", "#a57290"],
+    ["Arts & aesthetics", "#6887b3"],
+    ["History & traditions", "#998678"],
+    ["Other / interdisciplinary", "#94a0ac"]
+  ]
+}

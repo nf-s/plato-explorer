@@ -1,0 +1,68 @@
+{
+  "wikiProject": {
+    "category": "{importance}-importance psychology articles",
+    "importance": [
+      "Top",
+      "High",
+      "Mid",
+      "Low"
+    ]
+  },
+  "wikidataSeeds": [
+    {
+      "name": "psychologist",
+      "pattern": "?item wdt:P106 wd:Q212980",
+      "person": true
+    },
+    {
+      "name": "psychiatrist",
+      "pattern": "?item wdt:P106 wd:Q211346",
+      "person": true
+    },
+    {
+      "name": "psychoanalyst",
+      "pattern": "?item wdt:P106 wd:Q3410028",
+      "person": true
+    },
+    {
+      "name": "psychotherapist",
+      "pattern": "?item wdt:P106 wd:Q1900167",
+      "person": true
+    },
+    {
+      "name": "mental disorder",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q12135",
+      "person": false
+    },
+    {
+      "name": "cognitive bias",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q1127759",
+      "person": false
+    },
+    {
+      "name": "psychotherapy",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q183257",
+      "person": false
+    },
+    {
+      "name": "emotion",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q9415",
+      "person": false
+    },
+    {
+      "name": "psychology concept",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q96634632",
+      "person": false
+    },
+    {
+      "name": "personality trait",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q2393196",
+      "person": false
+    },
+    {
+      "name": "defence mechanism",
+      "pattern": "?item wdt:P31/wdt:P279* wd:Q2866472",
+      "person": false
+    }
+  ]
+}

@@ -321,7 +321,7 @@ export class ArticlePreview {
         typeof attribution.authors === "string" &&
         attribution.authors.trim()
       ) {
-        credit.textContent = `© ${typeof attribution.year === "string" ? `${attribution.year} ` : ""}${attribution.authors} · SEP`;
+        credit.textContent = `© ${typeof attribution.year === "string" ? `${attribution.year} ` : ""}${attribution.authors} · ${this.reader.source.shortName}`;
         credit.hidden = false;
       }
       status.hidden = Boolean(excerpt.textContent);

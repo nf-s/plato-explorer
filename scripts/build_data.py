@@ -1,4 +1,4 @@
-"""Build the local graph and article files from the structured SEP snapshot."""
+"""Build one explorer's local graph and article files from its article snapshot."""
 
 import argparse
 import hashlib
@@ -12,11 +12,10 @@ import pyarrow.parquet as pq
 
 from categories import people_ids, subject
 from extra_nodes import load_extra_nodes
-from fetch_source import ARTICLE_FILENAME, ATTRIBUTION_FILENAME
+from fetch_source import ATTRIBUTION_FILENAME
 from layout import communities_and_layout
+from sites import load_site, site_names, write_site_files
 from text_processing import MentionMatcher, clean_text, resolve_entry
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 def string_list(value, context):
@@ -31,7 +30,18 @@ def records(value, context):
     return value
 
 
-def validate_row(row):
+def validate_row(row, subjects):
+    """Check the shared article shape. Snapshots other than SEP also state each article's
+    address, type, subject and matching terms, because no curated lists exist for them."""
+    if row.get("url") is not None and not (isinstance(row["url"], str) and row["url"].startswith("https://")):
+        raise ValueError("Invalid article address")
+    if row.get("person") is not None and not isinstance(row["person"], bool):
+        raise ValueError("Invalid person flag")
+    if row.get("subject") is not None and row["subject"] not in subjects:
+        raise ValueError(f"Unknown subject: {row['subject']}")
+    for field in ("aliases", "blocked"):
+        if row.get(field) is not None:
+            string_list(row[field], f"{row.get('shorturl')}.{field}")
     for field in ("shorturl", "title", "pubinfo"):
         if not isinstance(row.get(field), str):
             raise ValueError(f"Invalid {field}")
@@ -48,6 +58,8 @@ def validate_row(row):
         for subsection in records(section.get("subsections"), "subsections"):
             clean_text(subsection.get("subsection_title"))
             string_list(subsection.get("content"), "subsection.content")
+            if subsection.get("level") not in (None, 3, 4):
+                raise ValueError("Invalid subsection level")
     for entry in records(row.get("related_entries"), "related_entries"):
         clean_text(entry.get("href"))
         clean_text(entry.get("text"))
@@ -69,7 +81,7 @@ def blocks_from_row(row):
         for paragraph in section["main_content"]:
             append("p", paragraph)
         for subsection in section["subsections"]:
-            kind = "h4" if re.match(r"\d+\.\d+\.\d", subsection["subsection_title"]) else "h3"
+            kind = "h4" if subsection.get("level") == 4 or re.match(r"\d+\.\d+\.\d", subsection["subsection_title"]) else "h3"
             append(kind, subsection["subsection_title"])
             for paragraph in subsection["content"]:
                 append("p", paragraph)
@@ -103,24 +115,25 @@ def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
-def build(source, output):
+def build(site, source, output):
     started = time.monotonic()
-    rows = [validate_row(row) for row in pq.read_table(source).to_pylist()]
+    rows = [validate_row(row, site.subjects) for row in pq.read_table(source).to_pylist()]
     rows.sort(key=lambda row: row["shorturl"])
     ids = {row["shorturl"]: i for i, row in enumerate(rows)}
     canonical_ids = {article_id.lower(): article_id for article_id in ids}
     if len(ids) != len(rows):
         raise ValueError("Duplicate article IDs in the source dataset")
-    people = people_ids(ids)
-    alias_path = Path(__file__).with_name("aliases.json")
-    aliases = json.loads(alias_path.read_text())
+    people = people_ids(ids, site.people) if site.people else {row["shorturl"] for row in rows if row.get("person")}
+    urls = {row["shorturl"]: row.get("url") or f"https://plato.stanford.edu/entries/{row['shorturl']}/" for row in rows}
+    ids_by_url = {row["url"]: row["shorturl"] for row in rows if row.get("url")}
+    aliases = json.loads((site.curation / "aliases.json").read_text())
     if not isinstance(aliases, dict):
         raise ValueError("Aliases must be an object")
     for article_id, variants in aliases.items():
         string_list(variants, f"aliases.{article_id}")
         if article_id not in ids:
             raise ValueError(f"Alias refers to an unknown article: {article_id}")
-    rules = json.loads(Path(__file__).with_name("mention_rules.json").read_text())
+    rules = json.loads((site.curation / "mention_rules.json").read_text())
     if not isinstance(rules, dict) or set(rules) != {"blocked", "excludedPhrases", "contextual"} or not isinstance(rules["blocked"], dict):
         raise ValueError("Invalid mention rules")
     string_list(rules["excludedPhrases"], "excludedPhrases")
@@ -135,8 +148,14 @@ def build(source, output):
             raise ValueError("Invalid contextual name rule")
         string_list(entry["aliases"], f"contextual.{article_id}.aliases")
         string_list(entry["blockers"], f"contextual.{article_id}.blockers")
+    for row in rows:
+        if row.get("aliases"):
+            known = aliases.setdefault(row["shorturl"], [])
+            known.extend(alias for alias in row["aliases"] if alias not in known)
+        if row.get("blocked"):
+            rules["blocked"].setdefault(row["shorturl"], []).extend(row["blocked"])
     titles = {row["shorturl"]: row["title"] for row in rows}
-    extras, keyword_audit = load_extra_nodes(rows, titles, aliases)
+    extras, keyword_audit = load_extra_nodes(rows, titles, aliases, site.curation / "extra_nodes.json", set(site.subjects))
     for node in extras:
         if node["id"] in ids:
             raise ValueError("Duplicate synthetic node ID")
@@ -176,15 +195,20 @@ def build(source, output):
         related = []
         seen_related = set()
         for entry in row["related_entries"]:
-            target_id = resolve_entry(entry["href"], article_id)
-            if target_id:
-                target_id = canonical_ids.get(target_id.lower(), target_id)
+            if ids_by_url:
+                target_id = ids_by_url.get(entry["href"])
+                related_url = entry["href"]
+            else:
+                target_id = resolve_entry(entry["href"], article_id)
+                if target_id:
+                    target_id = canonical_ids.get(target_id.lower(), target_id)
+                related_url = f"https://plato.stanford.edu/entries/{target_id}/" if target_id else None
             title = clean_text(entry["text"])
             identity = target_id or title
             if identity in seen_related:
                 continue
             seen_related.add(identity)
-            related.append({"title": title, "id": target_id if target_id in ids else None, "url": f"https://plato.stanford.edu/entries/{target_id}/" if target_id else None})
+            related.append({"title": title, "id": target_id if target_id in ids else None, "url": related_url})
             if target_id in ids and target_id != article_id:
                 target_index = ids[target_id]
                 edge = pair(source_index, target_index)
@@ -193,13 +217,13 @@ def build(source, output):
             elif target_id != article_id:
                 unresolved.append({"source": article_id, "target": target_id, "title": title})
         bibliography = [{"kind": "p", "text": clean_text(text), "links": []} for text in row["bibliography"] if text.strip()]
-        url = f"https://plato.stanford.edu/entries/{article_id}/"
+        url = urls[article_id]
         article = {"id": article_id, "title": clean_text(row["title"]), "url": url, "publication": clean_text(row["pubinfo"]), "blocks": blocks, "bibliography": bibliography, "related": related, "sourceToc": row["toc"], "attribution": attributions.get(article_id)}
         write_json(article_dir / f"{article_id}.json", article)
         summary = " ".join(clean_text(text) for text in row["preamble"])
         if not summary:
             summary = next((block["text"] for block in blocks if block["kind"] == "p"), "")
-        nodes.append({"id": article_id, "title": article["title"], "summary": summary[:700], "url": url, "aliases": aliases.get(article_id, []), "person": article_id in people, "kind": "person" if article_id in people else "topic", "article": True, "subject": subject(row), "mentions": 0, "references": 0, "degree": 0})
+        nodes.append({"id": article_id, "title": article["title"], "summary": summary[:700], "url": url, "aliases": aliases.get(article_id, []), "person": article_id in people, "kind": "person" if article_id in people else "topic", "article": True, "subject": row.get("subject") or subject(row), "mentions": 0, "references": 0, "degree": 0})
         if not any(block["kind"] == "p" for block in blocks):
             empty_articles.append(article_id)
         if (source_index + 1) % 250 == 0:
@@ -231,6 +255,7 @@ def build(source, output):
         "method": "Whole-word, case- and accent-insensitive, longest-first titles, curated aliases and curated synthetic names/keywords. Unicode hyphens normalized; known competing names and senses excluded. Preambles and main paragraphs only; self-mentions, headings, TOCs and bibliographies excluded.",
         "biographies": len(people), "mentionedPeople": sum(node["kind"] == "person" for node in extras), "keywords": sum(node["kind"] == "keyword" for node in extras),
     }
+    write_site_files(site, output)
     write_json(output / "graph.json", {"version": 1, "meta": meta, "nodes": nodes, "edges": edges, "communities": communities})
     write_json(output / "word-frequencies.json", keyword_audit.pop("wordFrequencies"))
     write_json(output / "keyword-report.json", keyword_audit)
@@ -240,7 +265,9 @@ def build(source, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=ROOT / "data" / ARTICLE_FILENAME)
-    parser.add_argument("--output", type=Path, default=ROOT / "web/data")
+    parser.add_argument("--site", default="plato", choices=site_names())
+    parser.add_argument("--source", type=Path)
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    build(args.source.resolve(), args.output.resolve())
+    chosen = load_site(args.site)
+    build(chosen, (args.source or chosen.source).resolve(), (args.output or chosen.output).resolve())

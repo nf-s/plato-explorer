@@ -1,0 +1,7 @@
+{
+  "source": "data/stanford_plato.parquet",
+  "output": "web/data",
+  "curation": "scripts",
+  "people": "people.json",
+  "pagesProject": "plato-network"
+}

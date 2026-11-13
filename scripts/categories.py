@@ -17,8 +17,8 @@ SUBJECT_TERMS = {
 PATTERNS = {name: re.compile(r"\b(?:" + terms + r")\b", re.I) for name, terms in SUBJECT_TERMS.items()}
 
 
-def people_ids(known):
-    values = json.loads(Path(__file__).with_name("people.json").read_text())
+def people_ids(known, path=Path(__file__).with_name("people.json")):
+    values = json.loads(Path(path).read_text())
     if not isinstance(values, list) or any(not isinstance(value, str) for value in values):
         raise ValueError("People must be a list of article IDs")
     if len(set(values)) != len(values) or set(values) - set(known):

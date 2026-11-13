@@ -6,6 +6,7 @@ import {
   normalize,
   number,
   searchArticles,
+  setSourceHosts,
   validateGraph,
   visibleGraph,
   withoutCommonMentions,
@@ -13,7 +14,13 @@ import {
 import { GraphView } from "./graph-view.js";
 import { ArticleReader } from "./reader.js";
 import { ConnectionEvidence } from "./evidence.js";
-import { category, nodeColor, palette } from "./categories.js";
+import { category, nodeColor, palette, setSubjects } from "./categories.js";
+import {
+  applySite,
+  partnerHref,
+  validatePartner,
+  validateSite,
+} from "./site.js";
 import { FullTextSearch } from "./full-text-search.js";
 import {
   NavigationHistory,
@@ -53,6 +60,8 @@ const state = {
   panel: "graph",
   reading: null,
 };
+let site;
+let partner = null;
 let graph;
 let index;
 let sourceGraph;
@@ -359,7 +368,11 @@ function renderSelection() {
     );
     const read = element("button", "primary-button", "Read article");
     read.addEventListener("click", () => reader.open(node));
-    const original = element("a", "secondary-button", "Original on SEP ↗");
+    const original = element(
+      "a",
+      "secondary-button",
+      `Original on ${site.source.shortName} ↗`,
+    );
     original.href = node.url;
     original.target = "_blank";
     original.rel = "noreferrer";
@@ -376,6 +389,18 @@ function renderSelection() {
           : "Person · no article in snapshot",
       ),
     );
+  }
+  const partnerLink = partnerHref(partner, node.id);
+  if (partnerLink !== null) {
+    const other = element(
+      "a",
+      "secondary-button",
+      `Open in ${partner.name} ↗`,
+    );
+    other.href = partnerLink;
+    const actions = element("div", "action-pair");
+    actions.append(other);
+    fragment.append(actions);
   }
   fragment.append(
     stats([
@@ -629,14 +654,14 @@ function setMode(mode) {
 
 function resetFilters() {
   filters.type = "all";
-  filters.minimum = 5;
+  filters.minimum = site.defaults.minimumMentions;
   filters.community = null;
   filters.common = true;
   filters.kinds = { person: true, topic: true, keyword: false };
   for (const kind of Object.keys(filters.kinds))
     get(`show-${kind}`).checked = filters.kinds[kind];
   get("link-type").value = "all";
-  get("min-mentions").value = "5";
+  get("min-mentions").value = String(filters.minimum);
   get("hide-common").checked = true;
 }
 
@@ -984,21 +1009,38 @@ function bind() {
 
 async function start() {
   try {
-    const response = await fetch("./data/graph.json");
-    if (!response.ok)
+    const [siteResponse, response, partnerResponse] = await Promise.all([
+      fetch("./data/site.json"),
+      fetch("./data/graph.json"),
+      fetch("./data/partner.json"),
+    ]);
+    if (!siteResponse.ok || !response.ok || !partnerResponse.ok)
       throw new Error(
         "The graph data is missing. Run the data build command below, then reload.",
       );
+    site = validateSite(await siteResponse.json());
+    applySite(site, document);
+    setSourceHosts(site.source.hosts);
+    setSubjects(site.subjects);
+    filters.minimum = site.defaults.minimumMentions;
     sourceGraph = validateGraph(await response.json());
+    partner = validatePartner(
+      await partnerResponse.json(),
+      new Set(sourceGraph.nodes.map((node) => node.id)),
+    );
     reducedGraph = withoutCommonMentions(sourceGraph);
     sourceIndex = createIndex(sourceGraph);
     reducedIndex = createIndex(reducedGraph);
     graph = reducedGraph;
     index = reducedIndex;
-    reader = new ArticleReader(sourceGraph, (id) => {
-      const nodeIndex = index.byId.get(id);
-      if (nodeIndex !== undefined) navigate(nodeIndex);
-    });
+    reader = new ArticleReader(
+      sourceGraph,
+      (id) => {
+        const nodeIndex = index.byId.get(id);
+        if (nodeIndex !== undefined) navigate(nodeIndex);
+      },
+      site.source,
+    );
     evidence = new ConnectionEvidence(reader);
     fullText = new FullTextSearch(sourceGraph, reader);
     view = new GraphView(
@@ -1047,6 +1089,10 @@ async function start() {
         tooltip.style.top = `${Math.min(hover.y + 15, hover.height - 115)}px`;
       },
     );
+    for (const kind of Object.keys(filters.kinds)) {
+      const present = sourceGraph.nodes.some((node) => node.kind === kind);
+      get(`show-${kind}`).closest("label").hidden = !present;
+    }
     const commonNames = [...commonTermIndices(sourceGraph)]
       .map((i) => sourceGraph.nodes[i].title)
       .sort();

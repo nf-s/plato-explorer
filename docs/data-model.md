@@ -10,6 +10,10 @@ The December 2023 snapshot from `dmarx` supplies author credits. The builder mat
 
 All input types and nested list structures are validated before processing. No article HTML is injected into the page. The reader creates text nodes and a small set of known DOM elements, and accepts only SEP HTTPS URLs for external article links.
 
+## Sites and optional row fields
+
+`scripts/build_data.py --site <name>` reads the source, output and curation folders from `sites/<name>/build.json`. The default site is `plato`. SEP rows use the fields described above. Rows from other sources may add `url`, `person`, `subject`, `aliases`, `blocked` and a subsection `level`. The builder validates each one and otherwise treats every site alike. Each build also writes `site.json` and, when absent, an empty `partner.json`. [Psychology Explorer](psychology.md)
+
 ## Mention extraction
 
 1. Decode HTML entities and collapse whitespace in the supplied paragraphs. Preserve text and section ordering.

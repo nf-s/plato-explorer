@@ -10,6 +10,11 @@ export const subjects = new Map([
   ["Other / interdisciplinary", "#94a0ac"],
 ]);
 
+export function setSubjects(entries) {
+  subjects.clear();
+  for (const [name, colour] of entries) subjects.set(name, colour);
+}
+
 export function category(node, mode) {
   if (mode === "subject") return node.subject;
   if (mode === "type")

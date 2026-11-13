@@ -58,8 +58,9 @@ export function readerParts(block, highlight = null) {
 }
 
 export class ArticleReader {
-  constructor(graph, onNavigate) {
+  constructor(graph, onNavigate, source) {
     this.graph = graph;
+    this.source = source;
     this.ids = new Set(graph.nodes.map((node) => node.id));
     this.dialog = document.getElementById("reader");
     this.content = document.getElementById("reader-content");
@@ -251,11 +252,11 @@ export class ArticleReader {
         typeof attribution.year === "string" &&
         attribution.year.trim()
         ? `Article © ${attribution.year} ${attribution.authors}. `
-        : "Article copyright remains with its authors. ",
-      "Stanford Encyclopedia of Philosophy © Metaphysics Research Lab, Stanford University. Unaffiliated visualization. ",
+        : this.source.articleRights,
+      this.source.readerNotice,
     );
     const copyrightLink = element("a", "", "Copyright information");
-    copyrightLink.href = "https://plato.stanford.edu/info.html#c";
+    copyrightLink.href = this.source.copyrightUrl;
     copyrightLink.target = "_blank";
     copyrightLink.rel = "noreferrer";
     copyright.append(copyrightLink);

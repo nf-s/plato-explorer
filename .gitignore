@@ -1,6 +1,7 @@
-# Local SEP downloads and generated material (including alternate output paths).
+# Local source downloads and generated material (including alternate output paths).
 /[Dd]ata/
 /web/data/
+/sites/*/data/
 *.parquet
 *.jsonl
 *.csv
@@ -24,5 +25,6 @@ __pycache__/
 .env*
 .wrangler/
 /wrangler.jsonc
+/sites/addresses.json
 client_secret*.json
 .DS_Store

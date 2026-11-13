@@ -22,7 +22,7 @@ def paragraphs(row):
             yield from subsection["content"]
 
 
-def validate_inventory(records):
+def validate_inventory(records, subjects=SUBJECTS):
     if not isinstance(records, list):
         raise ValueError("Extra nodes must be a list")
     ids = set()
@@ -35,7 +35,7 @@ def validate_inventory(records):
             raise ValueError("Duplicate or invalid extra-node ID")
         if not isinstance(record["kind"], str) or record["kind"] not in {"keyword", "person"} or not article_id.startswith(record["kind"] + "-"):
             raise ValueError("Extra-node kind does not match its ID")
-        if not isinstance(record["title"], str) or len(key(record["title"])) < 3 or not isinstance(record["subject"], str) or record["subject"] not in SUBJECTS:
+        if not isinstance(record["title"], str) or len(key(record["title"])) < 3 or not isinstance(record["subject"], str) or record["subject"] not in subjects:
             raise ValueError("Invalid extra-node title or subject")
         aliases = record["aliases"]
         if not isinstance(aliases, list) or any(not isinstance(alias, str) or len(key(alias)) < 3 for alias in aliases):
@@ -48,9 +48,9 @@ def validate_inventory(records):
     return records
 
 
-def load_extra_nodes(rows, titles, aliases, inventory_path=INVENTORY):
-    """Return (nodes, audit); generated nodes never pretend to have SEP articles."""
-    inventory = validate_inventory(json.loads(Path(inventory_path).read_text()))
+def load_extra_nodes(rows, titles, aliases, inventory_path=INVENTORY, subjects=SUBJECTS):
+    """Return (nodes, audit); generated nodes never pretend to have source articles."""
+    inventory = validate_inventory(json.loads(Path(inventory_path).read_text()), subjects)
     known_terms = {key(title) for title in titles.values()}
     known_terms.update(key(title[4:]) for title in titles.values() if title.lower().startswith("the "))
     known_terms.update(key(alias) for values in aliases.values() for alias in values)

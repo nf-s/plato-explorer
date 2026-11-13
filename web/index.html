@@ -6,14 +6,14 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Plato" />
+    <meta name="apple-mobile-web-app-title" content="Explorer" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
     <meta
       name="description"
-      content="Browse articles and connections in the Stanford Encyclopedia of Philosophy."
+      content="Browse encyclopedia articles and the connections between them."
     />
-    <title>Plato Explorer</title>
+    <title>Explorer</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
     <link
@@ -282,14 +282,8 @@
                 About &amp; copyright
               </button>
             </div>
-            <span>SEP articles © their authors</span
-            ><a
-              href="https://plato.stanford.edu/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Open Stanford Encyclopedia of Philosophy"
-              >↗</a
-            >
+            <span id="source-footer-text"></span
+            ><a id="source-footer-link" target="_blank" rel="noreferrer">↗</a>
           </div>
         </div>
       </aside>
@@ -313,8 +307,7 @@
           class="quiet-button"
           target="_blank"
           rel="noreferrer"
-          >Original on SEP ↗</a
-        >
+        ></a>
       </div>
       <div class="reader-layout">
         <nav
@@ -348,22 +341,7 @@
       </button>
       <h2 id="about-title">About the graph</h2>
       <h3>Copyright and attribution</h3>
-      <p>
-        Article text © the respective authors. The Stanford Encyclopedia of
-        Philosophy © Metaphysics Research Lab, Stanford University. All rights
-        reserved. Available author credits and links to the original articles
-        are retained in the reader.
-      </p>
-      <p>
-        This visualization is independent and is not affiliated with or endorsed
-        by Stanford University or the Stanford Encyclopedia of Philosophy.
-        <a
-          href="https://plato.stanford.edu/info.html#c"
-          target="_blank"
-          rel="noreferrer"
-          >SEP copyright information and terms of use</a
-        >.
-      </p>
+      <div id="about-copyright"></div>
       <h3>Nodes and connections</h3>
       <p>
         Larger nodes have more incoming mentions. Thicker lines have more
@@ -379,7 +357,8 @@
       <p>
         Enabled by default. It hides inferred mentions of article titles
         appearing in more than half the corpus. This reduces generic connections
-        to terms such as Time, Object, and Life. Explicit related-entry links
+        to terms such as <span id="about-common-examples"></span>. Explicit
+        related-entry links
         are preserved. Turn it off in Filters to restore every mention.
       </p>
       <h3>People and colours</h3>
@@ -388,9 +367,9 @@
         node stays visible regardless of these filters. People without a
         dedicated article and extracted keywords link to passages in the
         articles that mention them. Subject colours are approximate labels
-        inferred from titles, introductions, and related entries; they are not
-        SEP categories. Node type and connection count are alternative colour
-        modes.
+        inferred from titles, introductions, and related entries;
+        <span id="about-subject-note"></span>. Node type and connection count
+        are alternative colour modes.
       </p>
       <h3>Mentions</h3>
       <p>
@@ -417,12 +396,11 @@
         text is a local snapshot and may differ from the current encyclopedia.
       </p>
       <a
-        href="https://plato.stanford.edu/"
+        id="about-source-link"
         target="_blank"
         rel="noreferrer"
         class="text-button"
-        >Stanford Encyclopedia of Philosophy ↗</a
-      >
+      ></a>
     </dialog>
     <div
       id="announcement"

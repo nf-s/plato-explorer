@@ -30,6 +30,18 @@ python scripts/serve.py
 
 Open `http://127.0.0.1:5173` in your browser.
 
+## Psychology Explorer
+
+The same app also browses about 8,000 English Wikipedia articles on psychology. Each site has a folder under `sites/`. The psychology build needs a 35 GB Wikipedia snapshot. [Sources, build steps and matching](docs/psychology.md)
+
+```sh
+python scripts/build_data.py --site psychology
+python scripts/build_search.py --site psychology
+python scripts/serve.py --site psychology
+```
+
+A node found on both sites has a link to the other explorer.
+
 ## Copyright
 
-The repository contains no SEP articles or generated corpus files. Entry authors generally retain copyright in their articles. The Metaphysics Research Lab at Stanford University holds copyright in the encyclopedia. The MIT license covers the explorer code. [MIT license](LICENSE) · [Copyright notice](COPYRIGHT.md) · [SEP terms of use](https://plato.stanford.edu/info.html#terms)
+The repository contains no SEP articles, Wikipedia articles or generated corpus files. SEP entry authors generally retain copyright in their articles. The Metaphysics Research Lab at Stanford University holds copyright in the encyclopedia. Wikipedia text is available under CC BY-SA 4.0. The MIT license covers the explorer code. [MIT license](LICENSE) · [Copyright notice](COPYRIGHT.md) · [SEP terms of use](https://plato.stanford.edu/info.html#terms)

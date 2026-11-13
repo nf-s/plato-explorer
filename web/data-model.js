@@ -18,11 +18,18 @@ function integer(value) {
   return Number.isSafeInteger(value) && value >= 0;
 }
 
+let sourceHosts = new Set(["plato.stanford.edu"]);
+
+// Article links are accepted only for the hosts of the site's source.
+export function setSourceHosts(hosts) {
+  sourceHosts = new Set(hosts);
+}
+
 function validUrl(value) {
   if (typeof value !== "string") return false;
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === "plato.stanford.edu";
+    return url.protocol === "https:" && sourceHosts.has(url.hostname);
   } catch {
     return false;
   }

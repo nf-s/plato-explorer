@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Plato Explorer",
-  "short_name": "Plato",
-  "description": "Browse the Stanford Encyclopedia of Philosophy article network.",
+  "name": "Explorer",
+  "short_name": "Explorer",
+  "description": "Browse encyclopedia articles and the connections between them.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",

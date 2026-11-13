@@ -1,0 +1,7 @@
+{
+  "source": "data/psychology/articles.parquet",
+  "output": "sites/psychology/data",
+  "curation": "sites/psychology",
+  "people": null,
+  "pagesProject": "psyche-network"
+}

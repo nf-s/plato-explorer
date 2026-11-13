@@ -6,6 +6,12 @@ This is a Direct Upload project with no connected Git source. Pushing source to 
 
 The public project has no Pages Functions, D1 bindings, environment variables, or authentication API. The previous private Worker and its access database have their own resources. [Legacy deployment reference](deployment.md)
 
+## Psychology Explorer
+
+`python3 scripts/deploy_public.py --site psychology` releases the Wikipedia site to the Pages project named in `sites/psychology/build.json`. It stages `.artifacts/public-psychology/` from the same frontend allowlist and the data in `sites/psychology/data/`, and writes the site's name into the page shell and manifest. The project has the same Direct Upload setup, headers and crawler directives, with no Functions or bindings. Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. The first release used 8,147 files.
+
+Cross-site links carry the other site's address. Run `scripts/build_partner_links.py` before staging, then release both sites so each has current links. [Psychology Explorer](psychology.md)
+
 ## Local deployment skill
 
 Where installed, the personal `nfs-cloudflare-deploy` skill points maintainers to the appropriate release guide. Its general MA3 workflow describes Google sign-in, administrator grants, and a private Worker. Its Plato-specific route uses this public runbook. Preserve the existing public Pages architecture and neutral hostname for normal Plato releases.
