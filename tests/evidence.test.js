@@ -236,3 +236,35 @@ test("Homosexuality evidence accounts for every Foucault match in the corpus", a
   assert.equal(count, edge[source < target ? 2 : 3]);
   assert.ok(count > 0);
 });
+
+test("reader marks a linked passage that has no mention target", () => {
+  const text = "Plato distrusts writing. Aristotle classifies crafts.";
+  const block = {
+    kind: "p",
+    text,
+    links: [
+      [0, 5, "plato"],
+      [25, 34, "aristotle"],
+    ],
+  };
+  const parts = readerParts(block, { start: 0, end: 24, target: null });
+  const marked = parts
+    .flatMap((part) => part.segments)
+    .filter((segment) => segment.highlight);
+  assert.equal(
+    marked.map((segment) => segment.text).join(""),
+    "Plato distrusts writing.",
+  );
+  assert.ok(
+    marked.every((segment) => segment.highlight === "reader-passage-highlight"),
+  );
+  assert.deepEqual(
+    parts.filter((part) => part.target).map((part) => part.target),
+    ["plato", "aristotle"],
+  );
+  assert.ok(
+    readerParts(block, { start: 0, end: 999, target: null })
+      .flatMap((part) => part.segments)
+      .every((segment) => segment.highlight === null),
+  );
+});

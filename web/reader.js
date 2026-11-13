@@ -10,13 +10,14 @@ function validHighlight(block, highlight) {
     highlight.start >= 0 &&
     highlight.start < highlight.end &&
     highlight.end <= block.text.length &&
-    typeof highlight.target === "string" &&
-    block.links.some(
-      ([start, end, target]) =>
-        target === highlight.target &&
-        start >= highlight.start &&
-        end <= highlight.end,
-    )
+    (highlight.target === null ||
+      (typeof highlight.target === "string" &&
+        block.links.some(
+          ([start, end, target]) =>
+            target === highlight.target &&
+            start >= highlight.start &&
+            end <= highlight.end,
+        )))
   );
 }
 
@@ -35,7 +36,7 @@ export function readerParts(block, highlight = null) {
       segments.push({
         text: block.text.slice(from, to),
         highlight:
-          target === selected.target
+          target !== null && target === selected.target
             ? "reader-mention-highlight"
             : "reader-passage-highlight",
       });

@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { NavigationHistory, validateNavigation } from "../web/navigation.js";
+import {
+  NavigationHistory,
+  validateNavigation,
+  viewFromHash,
+  viewHash,
+} from "../web/navigation.js";
 
 const nodes = new Map([
   ["agency", { article: true }],
@@ -270,4 +275,90 @@ test("scroll restoration still works when session storage is unavailable", async
   app.host.history.forward();
   await app.host.pending;
   assert.equal(app.current().scroll.inspector, 700);
+});
+
+test("the address names the open article, block, passage and mention", () => {
+  const view = snapshot();
+  assert.equal(viewHash(view), "#/agency");
+  assert.equal(viewHash({ ...view, selected: null }), "");
+  const readers = [
+    [{ id: "kant", blockIndex: null, highlight: null }, "#/kant/read"],
+    [
+      { id: "kant", blockIndex: "related", highlight: null },
+      "#/kant/read/related",
+    ],
+    [{ id: "kant", blockIndex: 12, highlight: null }, "#/kant/read/12"],
+    [
+      {
+        id: "kant",
+        blockIndex: 12,
+        highlight: { start: 4, end: 90, target: null },
+      },
+      "#/kant/read/12/4-90",
+    ],
+    [
+      {
+        id: "kant",
+        blockIndex: 12,
+        highlight: { start: 4, end: 90, target: "keyword-dao" },
+      },
+      "#/kant/read/12/4-90/keyword-dao",
+    ],
+  ];
+  for (const [reader, hash] of readers) {
+    assert.equal(viewHash({ ...view, reader }), hash);
+    assert.deepEqual(viewFromHash(hash, nodes), { selected: "kant", reader });
+    assert.deepEqual(
+      validateNavigation({ ...view, selected: "kant", reader }, nodes)?.reader,
+      reader,
+    );
+  }
+});
+
+test("an address with unreadable parts keeps the parts before them", () => {
+  const top = { id: "kant", blockIndex: null, highlight: null };
+  const block = { id: "kant", blockIndex: 12, highlight: null };
+  const passage = {
+    id: "kant",
+    blockIndex: 12,
+    highlight: { start: 4, end: 90, target: null },
+  };
+  for (const [hash, expected] of [
+    ["", null],
+    ["#/missing/read/12", null],
+    ["#/%E0%A4%A/read", null],
+    ["#/kant", { selected: "kant", reader: null }],
+    ["#/kant/edit/12", { selected: "kant", reader: null }],
+    ["#/keyword-dao/read/12", { selected: "keyword-dao", reader: null }],
+    ["#/kant/read/-1", { selected: "kant", reader: top }],
+    ["#/kant/read/12/90-4", { selected: "kant", reader: block }],
+    ["#/kant/read/12/4-x", { selected: "kant", reader: block }],
+    ["#/kant/read/12/4-90/missing", { selected: "kant", reader: passage }],
+    ["#/kant/read/12/4-90/agency/extra", { selected: "kant", reader: passage }],
+  ])
+    assert.deepEqual(viewFromHash(hash, nodes), expected, hash);
+});
+
+test("a linked view has no saved reader position until the reader scrolls", () => {
+  const linked = snapshot();
+  linked.reader = { id: "kant", blockIndex: 12, highlight: null };
+  linked.scroll.reader = null;
+  assert.deepEqual(validateNavigation(linked, nodes), linked);
+  const invalid = snapshot();
+  invalid.scroll.list = null;
+  assert.equal(validateNavigation(invalid, nodes), null);
+});
+
+test("closing a linked reader rewrites the entry without adding one", async () => {
+  const app = setup();
+  await app.navigation.start();
+  const writes = app.host.historyWrites;
+  app.current().reader = { id: "kant", blockIndex: 12, highlight: null };
+  app.navigation.replace();
+  app.current().reader = null;
+  app.navigation.replace();
+  assert.equal(app.host.historyWrites, writes + 2);
+  assert.equal(app.navigation.position, 0);
+  assert.equal(app.navigation.canBack, false);
+  assert.equal(app.host.history.state.snapshot.reader, null);
 });

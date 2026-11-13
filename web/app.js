@@ -15,7 +15,12 @@ import { ArticleReader } from "./reader.js";
 import { ConnectionEvidence } from "./evidence.js";
 import { category, nodeColor, palette } from "./categories.js";
 import { FullTextSearch } from "./full-text-search.js";
-import { NavigationHistory, validateNavigation } from "./navigation.js";
+import {
+  NavigationHistory,
+  validateNavigation,
+  viewFromHash,
+  viewHash,
+} from "./navigation.js";
 
 function get(id) {
   const node = document.getElementById(id);
@@ -220,7 +225,8 @@ async function restoreView(saved) {
     const node = graph.nodes[sourceIndex.byId.get(saved.reader.id)];
     await reader.show(node, saved.reader.blockIndex, saved.reader.highlight);
     if (revision !== restoreRevision) return;
-    document.querySelector(".reader-article").scrollTop = saved.scroll.reader;
+    if (saved.scroll.reader !== null)
+      document.querySelector(".reader-article").scrollTop = saved.scroll.reader;
   }
 }
 
@@ -237,7 +243,7 @@ function closeReader() {
   else {
     state.reading = null;
     reader.dismiss();
-    navigation.save();
+    navigation.replace();
   }
 }
 
@@ -1057,17 +1063,16 @@ async function start() {
       validate: (saved) => validateNavigation(saved, nodes),
       fromURL: () => {
         const saved = structuredClone(defaultView);
-        const match = location.hash.match(/^#\/([^/]+)$/);
-        if (match) {
-          try {
-            const id = decodeURIComponent(match[1]);
-            if (nodes.has(id)) saved.selected = id;
-          } catch {}
+        const linked = viewFromHash(location.hash, nodes);
+        if (linked) {
+          saved.selected = linked.selected;
+          saved.reader = linked.reader;
+          if (linked.reader) saved.scroll.reader = null;
         }
         return saved;
       },
       url: (saved) =>
-        `${location.pathname}${location.search}${saved.selected === null ? "" : `#/${encodeURIComponent(saved.selected)}`}`,
+        `${location.pathname}${location.search}${viewHash(saved)}`,
       changed: historyButtons,
     });
     reader.onOpen = openReader;

@@ -118,6 +118,11 @@ export class NavigationHistory {
     this.flushTimer = setTimeout(() => this.flush(), 250);
   }
 
+  // Rewrites the current entry when a view changes without a new entry.
+  replace() {
+    if (!this.restoring) this.write(this.capture());
+  }
+
   push() {
     this.position += 1;
     this.maximum = this.position;
@@ -185,6 +190,67 @@ export class NavigationHistory {
   }
 }
 
+const SECTIONS = ["bibliography", "related"];
+
+// #/article selects a node. #/article/read/block/start-end/target opens the
+// reader at a block, a passage in it, and a mention inside that passage.
+export function viewHash(saved) {
+  if (saved.reader === null)
+    return saved.selected === null
+      ? ""
+      : `#/${encodeURIComponent(saved.selected)}`;
+  const { id, blockIndex, highlight } = saved.reader;
+  const parts = [encodeURIComponent(id), "read"];
+  if (blockIndex !== null) {
+    parts.push(String(blockIndex));
+    if (highlight !== null) {
+      parts.push(`${highlight.start}-${highlight.end}`);
+      if (highlight.target !== null)
+        parts.push(encodeURIComponent(highlight.target));
+    }
+  }
+  return `#/${parts.join("/")}`;
+}
+
+function decoded(part) {
+  try {
+    return decodeURIComponent(part);
+  } catch {
+    return null;
+  }
+}
+
+// An unreadable part is dropped along with everything after it.
+export function viewFromHash(hash, nodes) {
+  if (!hash.startsWith("#/")) return null;
+  const [first, action, block, range, mention, ...rest] = hash
+    .slice(2)
+    .split("/");
+  const id = decoded(first);
+  if (id === null || !nodes.has(id)) return null;
+  const view = { selected: id, reader: null };
+  if (action !== "read" || !nodes.get(id).article) return view;
+  view.reader = { id, blockIndex: null, highlight: null };
+  if (block === undefined) return view;
+  if (SECTIONS.includes(block)) {
+    view.reader.blockIndex = block;
+    return view;
+  }
+  if (!/^\d{1,7}$/.test(block)) return view;
+  view.reader.blockIndex = Number(block);
+  const offsets = range?.match(/^(\d{1,8})-(\d{1,8})$/);
+  if (!offsets) return view;
+  const start = Number(offsets[1]);
+  const end = Number(offsets[2]);
+  if (start >= end || end > 10000000) return view;
+  view.reader.highlight = { start, end, target: null };
+  if (mention === undefined || rest.length) return view;
+  const target = decoded(mention);
+  if (target !== null && nodes.has(target))
+    view.reader.highlight.target = target;
+  return view;
+}
+
 export function validateNavigation(value, nodes) {
   if (!value || typeof value !== "object") return null;
   const known = (id) => typeof id === "string" && nodes.has(id);
@@ -231,10 +297,13 @@ export function validateNavigation(value, nodes) {
     value.searchQuery.length > 1000
   )
     return null;
+  // A view opened from a link has no saved reader position yet.
   if (
     !value.scroll ||
     ["inspector", "reader", "list", "filters"].some(
-      (key) => !finite(value.scroll[key]) || value.scroll[key] < 0,
+      (key) =>
+        !(key === "reader" && value.scroll[key] === null) &&
+        (!finite(value.scroll[key]) || value.scroll[key] < 0),
     )
   )
     return null;
@@ -263,7 +332,7 @@ export function validateNavigation(value, nodes) {
       (!mark ||
         !integer(mark.start, 0, 10000000) ||
         !integer(mark.end, mark.start + 1, 10000000) ||
-        !known(mark.target))
+        (mark.target !== null && !known(mark.target)))
     )
       return null;
   }
