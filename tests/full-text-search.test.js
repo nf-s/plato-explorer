@@ -182,7 +182,7 @@ test("full-text search fetches only needed shards, caps article reads and caches
       };
     },
   };
-  const search = new FullTextSearch(graph, reader);
+  const search = new FullTextSearch(graph, reader, "./data/philosophy/");
   const first = await search.search("justice", { limit: 1 });
   assert.equal(first.total, 3);
   assert.equal(first.results.length, 1);
@@ -212,7 +212,7 @@ test("cancelled searches do not return stale excerpts, including cached-index se
       return { title: node.title, blocks: [], bibliography: [] };
     },
   };
-  const search = new FullTextSearch(graph, reader);
+  const search = new FullTextSearch(graph, reader, "./data/philosophy/");
   search.manifest = manifest;
   search.shards.set(shardFor("justice"), { justice: [0, 1] });
   await assert.rejects(
@@ -229,7 +229,7 @@ test("generated index finds a term in an article's main text with no title match
   let raw;
   try {
     raw = await readFile(
-      new URL("../web/data/search/manifest.json", import.meta.url),
+      new URL("../web/data/philosophy/search/manifest.json", import.meta.url),
       "utf8",
     );
   } catch (error) {
@@ -238,7 +238,7 @@ test("generated index finds a term in an article's main text with no title match
     throw error;
   }
   const graph = JSON.parse(
-    await readFile(new URL("../web/data/graph.json", import.meta.url), "utf8"),
+    await readFile(new URL("../web/data/philosophy/graph.json", import.meta.url), "utf8"),
   );
   const manifest = validateManifest(JSON.parse(raw), graph);
   const query = "panopticon";
@@ -247,7 +247,7 @@ test("generated index finds a term in an article's main text with no title match
     JSON.parse(
       await readFile(
         new URL(
-          `../web/data/search/${String(shard).padStart(3, "0")}.json`,
+          `../web/data/philosophy/search/${String(shard).padStart(3, "0")}.json`,
           import.meta.url,
         ),
         "utf8",
@@ -270,7 +270,7 @@ test("generated index finds a term in an article's main text with no title match
   );
   const article = JSON.parse(
     await readFile(
-      new URL("../web/data/articles/foucault.json", import.meta.url),
+      new URL("../web/data/philosophy/articles/foucault.json", import.meta.url),
       "utf8",
     ),
   );

@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from build_partner_links import shared_nodes
+from build_realm_links import shared_nodes
 from wikipedia_rows import article_ids, convert, is_person, matching_terms, subject
 from wikipedia_select import link_title, outgoing_titles
 

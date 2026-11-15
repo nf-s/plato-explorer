@@ -207,16 +207,19 @@ export function excerpt(article, terms) {
 }
 
 export class FullTextSearch {
-  constructor(graph, reader) {
+  constructor(graph, reader, dataPath) {
     this.graph = graph;
     this.reader = reader;
+    this.dataPath = dataPath;
     this.articleCount = graph.nodes.filter((node) => node.article).length;
     this.manifest = null;
     this.shards = new Map();
   }
 
   async json(path, signal) {
-    const response = await fetch(`./data/search/${path}`, { signal });
+    const response = await fetch(`${this.dataPath}search/${path}`, {
+      signal,
+    });
     if (response.status === 401)
       throw new Error("Your session expired. Reload to sign in again.");
     if (!response.ok)

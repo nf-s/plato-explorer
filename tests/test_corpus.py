@@ -3,7 +3,7 @@ import unittest
 from collections import Counter
 from pathlib import Path
 
-DATA = Path(__file__).resolve().parents[1] / "web/data"
+DATA = Path(__file__).resolve().parents[1] / "web/data/philosophy"
 
 
 @unittest.skipUnless((DATA / "graph.json").exists(), "Build the dataset to run corpus checks")

@@ -197,7 +197,7 @@ def audit(baseline, data_dir, aliases_path=ROOT / "scripts/aliases.json"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline", required=True, type=Path)
-    parser.add_argument("--data-dir", type=Path, default=ROOT / "web/data")
+    parser.add_argument("--data-dir", type=Path, default=ROOT / "web/data/philosophy")
     parser.add_argument("--output", type=Path, default=ROOT / ".artifacts/link-audit.json")
     args = parser.parse_args()
     report = audit(args.baseline, args.data_dir)

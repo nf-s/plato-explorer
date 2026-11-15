@@ -10,9 +10,9 @@ The December 2023 snapshot from `dmarx` supplies author credits. The builder mat
 
 All input types and nested list structures are validated before processing. No article HTML is injected into the page. The reader creates text nodes and a small set of known DOM elements, and accepts only SEP HTTPS URLs for external article links.
 
-## Sites and optional row fields
+## Realms and optional row fields
 
-`scripts/build_data.py --site <name>` reads the source, output and curation folders from `sites/<name>/build.json`. The default site is `plato`. SEP rows use the fields described above. Rows from other sources may add `url`, `person`, `subject`, `aliases`, `blocked` and a subsection `level`. The builder validates each one and otherwise treats every site alike. Each build also writes `site.json` and, when absent, an empty `partner.json`. [Psychology Explorer](psychology.md)
+`scripts/build_data.py --realm <id>` reads the source and curation folders from `realms/<id>/build.json` and writes to `web/data/<id>/`. The default realm is the first in `realms/app.json`. SEP rows use the fields described above. Rows from other sources may add `url`, `person`, `subject`, `aliases`, `blocked` and a subsection `level`. The builder validates each one and otherwise treats every realm alike. Each build also copies `realm.json`, writes an empty `links.json` when none exists and refreshes `web/data/realms.json`. Paths below are for Philosophy. [Realms](realms.md)
 
 ## Mention extraction
 
@@ -52,7 +52,7 @@ This example shows the graph structure with empty arrays. Local builds fill the 
 }
 ```
 
-Each node contains `id`, `title`, `url`, a short `summary`, search `aliases`, incoming `mentions`, the number of distinct articles with a text mention (`references`), total unique neighbors including related entries (`degree`), layout coordinates `x`/`y`, an integer `community`, a boolean `person`, a `subject` label, `kind` (`person`, `topic`, or `keyword`), and `article` (boolean). Articles are sorted by their case-sensitive IDs at the start of the array. Additional people and keywords follow. These nodes have `article: false`, `url: null`, and no article JSON file. Each build records counts in the local `web/data/build-report.json`.
+Each node contains `id`, `title`, `url`, a short `summary`, search `aliases`, incoming `mentions`, the number of distinct articles with a text mention (`references`), total unique neighbors including related entries (`degree`), layout coordinates `x`/`y`, an integer `community`, a boolean `person`, a `subject` label, `kind` (`person`, `topic`, or `keyword`), and `article` (boolean). Articles are sorted by their case-sensitive IDs at the start of the array. Additional people and keywords follow. These nodes have `article: false`, `url: null`, and no article JSON file. Each build records counts in the local `web/data/philosophy/build-report.json`.
 
 Each edge is a compact six-value tuple.
 
@@ -69,7 +69,7 @@ Node radii increase on a compressed scale with incoming mentions. Edge thickness
 
 ## Article files
 
-`web/data/articles/<id>.json` contains the title, original URL, publication text, ordered text blocks, bibliography blocks, related-entry list, original source TOC, and optional attribution from the JSONL snapshot. A paragraph can contain multiple linked spans, as in this invented example.
+`web/data/philosophy/articles/<id>.json` contains the title, original URL, publication text, ordered text blocks, bibliography blocks, related-entry list, original source TOC, and optional attribution from the JSONL snapshot. A paragraph can contain multiple linked spans, as in this invented example.
 
 ```json
 {
@@ -98,7 +98,7 @@ Selecting any node produces a deterministic radial neighbourhood with the strong
 
 ## Reproducibility
 
-The source hash, matching method, summary counts, ambiguous terms, unresolved related entries, and community summaries are recorded in `web/data/build-report.json`. The build does not fetch the encyclopedia or mutate the original datasets. To reproduce the primary graph, use the pinned dataset and Python dependencies. Downloaded and generated files stay outside Git.
+The source hash, matching method, summary counts, ambiguous terms, unresolved related entries, and community summaries are recorded in `web/data/philosophy/build-report.json`. The build does not fetch the encyclopedia or mutate the original datasets. To reproduce the primary graph, use the pinned dataset and Python dependencies. Downloaded and generated files stay outside Git.
 
 ## People, subject colours, and evidence
 
@@ -112,8 +112,8 @@ Full-text indexing is separate from graph matching, includes headings and biblio
 
 ## Additional people, keywords, and frequencies
 
-The offline frequency scan counts alphabetic word tokens in preambles and main paragraphs. Internal apostrophes are retained. Each row records word frequency and distinct source-article count. The frequency scan excludes headings, numbers, and bibliographies. The separate full-text index covers a broader set of text. Its output stays local at `web/data/word-frequencies.json`. [Frequency builder](../scripts/extra_nodes.py)
+The offline frequency scan counts alphabetic word tokens in preambles and main paragraphs. Internal apostrophes are retained. Each row records word frequency and distinct source-article count. The frequency scan excludes headings, numbers, and bibliographies. The separate full-text index covers a broader set of text. Its output stays local at `web/data/philosophy/word-frequencies.json`. [Frequency builder](../scripts/extra_nodes.py)
 
-Promotion to a node requires human review of the concept or person, a distinct title and aliases, and candidate matches in at least two articles. A person-focused topic can coexist with a separate person node when a dedicated biography is absent. The builder excludes candidates that duplicate existing titles or aliases or occur in too few articles. The full matcher applies longest-match and ambiguity rules to accepted candidates. The graph records final linked spans and `web/data/keyword-report.json` records candidate decisions and examples locally.
+Promotion to a node requires human review of the concept or person, a distinct title and aliases, and candidate matches in at least two articles. A person-focused topic can coexist with a separate person node when a dedicated biography is absent. The builder excludes candidates that duplicate existing titles or aliases or occur in too few articles. The full matcher applies longest-match and ambiguity rules to accepted candidates. The graph records final linked spans and `web/data/philosophy/keyword-report.json` records candidate decisions and examples locally.
 
 Every edge to an additional node originates in a real article. A keywords-only overview therefore contains nodes with no edges. Select a keyword and enable People or Topics to see which articles mention it and read their passages. The link audit gives examples of how a phrase becomes an alias, a separate node, or an exclusion. [Review decisions](link-audit.md#decisions-visible-in-the-graph)

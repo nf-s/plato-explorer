@@ -1,7 +1,6 @@
 {
-  "id": "plato",
-  "name": "Plato Explorer",
-  "shortName": "Plato",
+  "id": "philosophy",
+  "name": "Philosophy",
   "description": "Browse articles and connections in the Stanford Encyclopedia of Philosophy.",
   "source": {
     "name": "Stanford Encyclopedia of Philosophy",

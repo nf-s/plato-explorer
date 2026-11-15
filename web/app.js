@@ -16,11 +16,15 @@ import { ArticleReader } from "./reader.js";
 import { ConnectionEvidence } from "./evidence.js";
 import { category, nodeColor, palette, setSubjects } from "./categories.js";
 import {
-  applySite,
-  partnerHref,
-  validatePartner,
-  validateSite,
-} from "./site.js";
+  applyRealm,
+  chosenRealm,
+  dataPath,
+  linkedRealms,
+  realmHref,
+  validateLinks,
+  validateRealm,
+  validateRealms,
+} from "./realm.js";
 import { FullTextSearch } from "./full-text-search.js";
 import {
   NavigationHistory,
@@ -60,8 +64,10 @@ const state = {
   panel: "graph",
   reading: null,
 };
-let site;
-let partner = null;
+const appName = document.title;
+let realms = [];
+let realm;
+let linked = [];
 let graph;
 let index;
 let sourceGraph;
@@ -371,7 +377,7 @@ function renderSelection() {
     const original = element(
       "a",
       "secondary-button",
-      `Original on ${site.source.shortName} ↗`,
+      `Original on ${realm.source.shortName} ↗`,
     );
     original.href = node.url;
     original.target = "_blank";
@@ -390,16 +396,15 @@ function renderSelection() {
       ),
     );
   }
-  const partnerLink = partnerHref(partner, node.id);
-  if (partnerLink !== null) {
-    const other = element(
+  for (const other of linkedRealms(linked, realms, node.id)) {
+    const link = element(
       "a",
       "secondary-button",
-      `Open in ${partner.name} ↗`,
+      `Open in ${other.realm.name}`,
     );
-    other.href = partnerLink;
+    link.href = other.href;
     const actions = element("div", "action-pair");
-    actions.append(other);
+    actions.append(link);
     fragment.append(actions);
   }
   fragment.append(
@@ -654,7 +659,7 @@ function setMode(mode) {
 
 function resetFilters() {
   filters.type = "all";
-  filters.minimum = site.defaults.minimumMentions;
+  filters.minimum = realm.defaults.minimumMentions;
   filters.community = null;
   filters.common = true;
   filters.kinds = { person: true, topic: true, keyword: false };
@@ -1007,26 +1012,63 @@ function bind() {
   });
 }
 
+// Each realm is a separate graph, so choosing one loads the page afresh.
+function renderRealmPicker(chosen) {
+  const picker = get("realm-picker");
+  get("realm-name").textContent = chosen.name;
+  get("realm-source").textContent = chosen.sourceShortName;
+  get("realm-menu").replaceChildren(
+    ...realms.map((entry) => {
+      const link = element("a", "realm-option");
+      link.href = realmHref(realms, entry.id);
+      if (entry.id === chosen.id) link.setAttribute("aria-current", "page");
+      link.append(
+        element("strong", "", entry.name),
+        element("small", "", entry.source),
+      );
+      return link;
+    }),
+  );
+  picker.hidden = realms.length < 2;
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target instanceof Node && !picker.contains(event.target))
+      picker.open = false;
+  });
+  picker.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !picker.open) return;
+    event.stopPropagation();
+    picker.open = false;
+    picker.querySelector("summary")?.focus();
+  });
+}
+
 async function start() {
   try {
-    const [siteResponse, response, partnerResponse] = await Promise.all([
-      fetch("./data/site.json"),
-      fetch("./data/graph.json"),
-      fetch("./data/partner.json"),
+    const missing =
+      "The graph data is missing. Run the data build command below, then reload.";
+    const realmsResponse = await fetch("./data/realms.json");
+    if (!realmsResponse.ok) throw new Error(missing);
+    realms = validateRealms(await realmsResponse.json());
+    const chosen = chosenRealm(realms, location.search);
+    const data = dataPath(chosen);
+    renderRealmPicker(chosen);
+    const [realmResponse, response, linksResponse] = await Promise.all([
+      fetch(`${data}realm.json`),
+      fetch(`${data}graph.json`),
+      fetch(`${data}links.json`),
     ]);
-    if (!siteResponse.ok || !response.ok || !partnerResponse.ok)
-      throw new Error(
-        "The graph data is missing. Run the data build command below, then reload.",
-      );
-    site = validateSite(await siteResponse.json());
-    applySite(site, document);
-    setSourceHosts(site.source.hosts);
-    setSubjects(site.subjects);
-    filters.minimum = site.defaults.minimumMentions;
+    if (!realmResponse.ok || !response.ok || !linksResponse.ok)
+      throw new Error(missing);
+    realm = validateRealm(await realmResponse.json(), chosen.id);
+    applyRealm(realm, appName, document);
+    setSourceHosts(realm.source.hosts);
+    setSubjects(realm.subjects);
+    filters.minimum = realm.defaults.minimumMentions;
     sourceGraph = validateGraph(await response.json());
-    partner = validatePartner(
-      await partnerResponse.json(),
+    linked = validateLinks(
+      await linksResponse.json(),
       new Set(sourceGraph.nodes.map((node) => node.id)),
+      realms.filter((entry) => entry.id !== chosen.id),
     );
     reducedGraph = withoutCommonMentions(sourceGraph);
     sourceIndex = createIndex(sourceGraph);
@@ -1039,10 +1081,11 @@ async function start() {
         const nodeIndex = index.byId.get(id);
         if (nodeIndex !== undefined) navigate(nodeIndex);
       },
-      site.source,
+      realm.source,
+      data,
     );
     evidence = new ConnectionEvidence(reader);
-    fullText = new FullTextSearch(sourceGraph, reader);
+    fullText = new FullTextSearch(sourceGraph, reader, data);
     view = new GraphView(
       get("graph"),
       graph,

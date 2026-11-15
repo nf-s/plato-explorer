@@ -6,11 +6,13 @@ This is a Direct Upload project with no connected Git source. Pushing source to 
 
 The public project has no Pages Functions, D1 bindings, environment variables, or authentication API. The previous private Worker and its access database have their own resources. [Legacy deployment reference](deployment.md)
 
-## Psychology Explorer
+## Realms
 
-`python3 scripts/deploy_public.py --site psychology` releases the Wikipedia site to the Pages project named in `sites/psychology/build.json`. It stages `.artifacts/public-psychology/` from the same frontend allowlist and the data in `sites/psychology/data/`, and writes the site's name into the page shell and manifest. The project has the same Direct Upload setup, headers and crawler directives, with no Functions or bindings. Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. The first release used 8,147 files.
+One release carries the app and every built realm. The script stages `.artifacts/public/` with the frontend allowlist, `data/realms.json` and each realm's `realm.json`, `links.json`, `graph.json`, `articles/` and `search/`. Local build reports are left out. The Pages project comes from `realms/app.json`. Run `scripts/build_realm_links.py` before staging. [Realms](realms.md)
 
-Cross-site links carry the other site's address. Run `scripts/build_partner_links.py` before staging, then release both sites so each has current links. [Psychology Explorer](psychology.md)
+Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. Two realms stage about 10,050 files.
+
+The psychology realm was first released to a separate Pages project, `psyche-network`. Retire or redirect it once the combined app is released.
 
 ## Local deployment skill
 
@@ -20,7 +22,7 @@ Where installed, the personal `nfs-cloudflare-deploy` skill points maintainers t
 
 Release only on an explicit deployment request to an agreed destination. The upload includes article text. Confirm permission from the relevant rights holders for the proposed public redistribution before uploading it. [Copyright and terms](../COPYRIGHT.md)
 
-Generated data must already be present under `web/data/`. Rebuild the corpus and full-text index using the [README commands](../README.md) when source data, aliases, matching rules, or search generation change. The public deployment script does not rebuild them.
+Generated data must already be present under `web/data/<realm>/`. Rebuild the corpus and full-text index using the [README commands](../README.md) when source data, aliases, matching rules, or search generation change. The public deployment script does not rebuild them.
 
 For local review without network changes:
 
@@ -72,7 +74,7 @@ Check unauthenticated GET and HEAD requests against both canonical and deploymen
 
 - `/`, `/app.js`, `/navigation.js`, and `/styles.css`
 - `/robots.txt`, `/manifest.webmanifest`, and the Apple touch and manifest icons
-- `/data/graph.json`, an encoded graph path, `/data/articles/nietzsche.json`, `/data/search/manifest.json`, and a search shard.
+- `/data/realms.json`, then for each realm `/data/<realm>/realm.json`, `/data/<realm>/graph.json`, an encoded graph path, an article such as `/data/philosophy/articles/nietzsche.json`, `/data/<realm>/search/manifest.json`, and a search shard.
 
 Responses must carry the expected crawl and security headers and load without authentication redirects or session cookies. `/index.html` may redirect to `/` because Pages canonicalizes HTML paths. Compare deployed content with the freshly staged files where practical. Confirm `robots.txt` disallows `/`. Cloudflare's edge has rejected Python's default urllib user agent with error 1010. A browser check distinguished this edge response from a failing app in the original release.
 

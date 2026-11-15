@@ -1,0 +1,7 @@
+[
+  { "philosophy": "anderson-john", "psychology": "john-robert-anderson-psychologist" },
+  { "philosophy": "functionalism", "psychology": "functional-psychology" },
+  { "philosophy": "laws-of-nature", "psychology": "natural-law" },
+  { "philosophy": "negation", "psychology": "negation-freud" },
+  { "philosophy": "keyword-despair", "psychology": "depression-mood" }
+]

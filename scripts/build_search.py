@@ -8,7 +8,7 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 
-from sites import load_site, site_names
+from realms import load_realm, realm_names
 
 SHARDS = 128
 TOKEN = re.compile(r"[^\W_]+", re.UNICODE)
@@ -73,7 +73,7 @@ def build(data_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--site", default="plato", choices=site_names())
+    parser.add_argument("--realm", default=realm_names()[0], choices=realm_names())
     parser.add_argument("--data-dir", type=Path)
     args = parser.parse_args()
-    build((args.data_dir or load_site(args.site).output).resolve())
+    build((args.data_dir or load_realm(args.realm).output).resolve())

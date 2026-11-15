@@ -26,7 +26,7 @@ From the project root, preserve the current graph before editing the inventory o
 
 ```sh
 mkdir -p .artifacts/next-link-review
-cp web/data/graph.json .artifacts/next-link-review/baseline-graph.json
+cp web/data/philosophy/graph.json .artifacts/next-link-review/baseline-graph.json
 ```
 
 After editing, rebuild the graph and audit it against that copy.
@@ -35,7 +35,7 @@ After editing, rebuild the graph and audit it against that copy.
 .venv/bin/python scripts/build_data.py
 python3 scripts/audit_links.py \
   --baseline .artifacts/next-link-review/baseline-graph.json \
-  --data-dir web/data \
+  --data-dir web/data/philosophy \
   --output .artifacts/next-link-review/link-audit.json
 ```
 

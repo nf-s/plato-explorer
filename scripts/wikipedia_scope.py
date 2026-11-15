@@ -90,7 +90,7 @@ def build(config, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=ROOT / "sites/psychology/scope.json")
+    parser.add_argument("--config", type=Path, default=ROOT / "realms/psychology/scope.json")
     parser.add_argument("--output", type=Path, default=ROOT / "data/wikipedia/candidates.json")
     args = parser.parse_args()
     build(args.config.resolve(), args.output.resolve())

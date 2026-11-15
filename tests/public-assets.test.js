@@ -39,7 +39,7 @@ test("crawler exclusions cover the entire public site and all data responses", a
 
 test("public staging contains the app and data without private account assets or deployment sources", async (t) => {
   try {
-    await access(new URL("web/data/search/manifest.json", root));
+    await access(new URL("web/data/philosophy/search/manifest.json", root));
   } catch (error) {
     if (error.code === "ENOENT")
       return t.skip("Build the dataset and full-text index first.");
@@ -68,9 +68,13 @@ test("public staging contains the app and data without private account assets or
     "icons/icon-512.png",
     "robots.txt",
     "_headers",
-    "data/graph.json",
-    "data/articles/nietzsche.json",
-    "data/search/manifest.json",
+    "realm.js",
+    "data/realms.json",
+    "data/philosophy/realm.json",
+    "data/philosophy/links.json",
+    "data/philosophy/graph.json",
+    "data/philosophy/articles/nietzsche.json",
+    "data/philosophy/search/manifest.json",
   ])
     assert.ok(names.includes(path), `Missing public asset: ${path}`);
   assert.ok(

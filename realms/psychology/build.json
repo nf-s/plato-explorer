@@ -1,0 +1,5 @@
+{
+  "source": "data/psychology/articles.parquet",
+  "curation": "realms/psychology",
+  "people": null
+}

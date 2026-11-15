@@ -1,0 +1,5 @@
+{
+  "source": "data/stanford_plato.parquet",
+  "curation": "scripts",
+  "people": "people.json"
+}

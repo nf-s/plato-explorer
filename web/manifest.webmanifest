@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Explorer",
-  "short_name": "Explorer",
+  "name": "Plato Explorer",
+  "short_name": "Plato",
   "description": "Browse encyclopedia articles and the connections between them.",
   "lang": "en",
   "start_url": "./",

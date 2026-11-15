@@ -30,17 +30,15 @@ python scripts/serve.py
 
 Open `http://127.0.0.1:5173` in your browser.
 
-## Psychology Explorer
+## Realms
 
-The same app also browses about 8,000 English Wikipedia articles on psychology. Each site has a folder under `sites/`. The psychology build needs a 35 GB Wikipedia snapshot. [Sources, build steps and matching](docs/psychology.md)
+The explorer shows one realm at a time. Philosophy is the SEP. Psychology is about 8,000 English Wikipedia articles, and its build needs a 35 GB Wikipedia snapshot. A node found in both realms links to the other. [Realms](docs/realms.md) · [Psychology sources and build steps](docs/psychology.md)
 
 ```sh
-python scripts/build_data.py --site psychology
-python scripts/build_search.py --site psychology
-python scripts/serve.py --site psychology
+python scripts/build_data.py --realm psychology
+python scripts/build_search.py --realm psychology
+python scripts/build_realm_links.py
 ```
-
-A node found on both sites has a link to the other explorer.
 
 ## Copyright
 

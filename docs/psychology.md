@@ -1,15 +1,11 @@
-# Psychology Explorer
+# Psychology realm
 
-Psychology Explorer is a second site built from this repository. It uses the same web app as Plato Explorer and a corpus of English Wikipedia articles about psychology. Each site has a folder under `sites/`.
+The Psychology realm is built from English Wikipedia articles about psychology. It uses the same app, graph builder and search builder as Philosophy. [Realms](realms.md)
 
-| File                         | Purpose                                                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `sites/<name>/site.json`     | Interface settings shipped to the browser: names, source credit, notices, defaults, subjects   |
-| `sites/<name>/build.json`    | Local build settings: source rows, output folder, curation folder and Pages project            |
-| `sites/psychology/scope.json` | The WikiProject categories and Wikidata classes that nominate articles                        |
-| `sites/psychology/*.json`    | Hand-reviewed aliases, extra nodes and matching rules, in the formats the Plato files use      |
-
-Plato's curation files remain in `scripts/` and its generated data in `web/data/`. Psychology data is written to `sites/psychology/data/`, which Git ignores.
+| File                           | Purpose                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| `realms/psychology/scope.json` | The WikiProject categories and Wikidata classes that nominate articles                    |
+| `realms/psychology/*.json`     | Hand-reviewed aliases, extra nodes and matching rules, in the formats Philosophy uses     |
 
 ## Source
 
@@ -35,12 +31,13 @@ python scripts/wikipedia_select.py expand
 python scripts/wikipedia_extract.py extract --titles data/wikipedia/neighbours.json --output data/wikipedia/neighbours.jsonl
 python scripts/wikipedia_select.py select
 python scripts/wikipedia_rows.py
-python scripts/build_data.py --site psychology
-python scripts/build_search.py --site psychology
-python scripts/serve.py --site psychology
+python scripts/build_data.py --realm psychology
+python scripts/build_search.py --realm psychology
+python scripts/build_realm_links.py
+python scripts/serve.py
 ```
 
-`wikipedia_rows.py` writes rows in the schema `build_data.py` reads for the SEP, with optional fields for the article address, person flag, subject, aliases and blocked titles. The graph, reader and search steps are shared by both sites.
+`wikipedia_rows.py` writes rows in the schema `build_data.py` reads for the SEP, with optional fields for the article address, person flag, subject, aliases and blocked titles. The graph, reader and search steps are shared by every realm.
 
 ## Which articles are included
 
@@ -65,23 +62,7 @@ Wikipedia titles include ordinary words. An article called Time would otherwise 
 - An **alias** comes from link text used by at least two articles. A phrase needs a 10% share and a single word 20%. The share must also be three times the article's ordinary link rate, because much of the corpus links to Psychology whether or not it says “psychological”.
 - A **surname** needs a 50% share. “Freud” passes. A surname shared by several psychologists does not.
 
-`data/psychology/matching-report.json` lists every decision with its share. Review it after changing a threshold. Corrections that the measurements cannot make belong in `sites/psychology/aliases.json` and `mention_rules.json`.
-
-## Links between the two sites
-
-`scripts/build_partner_links.py plato psychology` compares node titles and aliases in both graphs and writes `partner.json` into each site's data folder. A person matches only a person. When the selected node exists on the other site, the sidebar shows **Open in Psychology Explorer** or **Open in Plato Explorer**. The graphs stay separate.
-
-Matches rely on names, so a few join different subjects. List reviewed false matches in `sites/partner_exclusions.json`.
-
-The script reads each site's public address from `sites/addresses.json`, which Git ignores. Without that file the builds write an empty `partner.json` and the button stays hidden.
-
-```json
-{ "plato": "https://example.org", "psychology": "https://example.net" }
-```
-
-## Deployment
-
-`python scripts/deploy_public.py --site psychology` stages `.artifacts/public-psychology/` and uploads it to the Pages project named in `sites/psychology/build.json`. The procedure and checks are in [public deployment](public-deployment.md). A Pages project on the Free plan accepts 20,000 files of up to 25 MiB each. Check the staged file count and the size of `graph.json` before a release.
+`data/psychology/matching-report.json` lists every decision with its share. Review it after changing a threshold. Corrections that the measurements cannot make belong in `realms/psychology/aliases.json` and `mention_rules.json`.
 
 ## Licence
 
@@ -91,6 +72,6 @@ Wikipedia text is available under [CC BY-SA 4.0](https://creativecommons.org/lic
 
 - People are identified from Wikidata occupations and infobox fields. Some are missed and appear as topics.
 - Subjects are estimated from the nominating class and words in the introduction.
-- The site has no keyword nodes or people without articles yet. `sites/psychology/extra_nodes.json` accepts them in the Plato format.
+- The realm has no keyword nodes or people without articles yet. `realms/psychology/extra_nodes.json` accepts them in the Philosophy format.
 - The snapshot omits most “See also” sections, so few connections are flagged as related entries.
 - Lists become bulleted paragraphs. Tables, images, formulas and references are omitted.

@@ -1,15 +1,13 @@
-"""Verify and deploy one explorer's public static assets to Cloudflare Pages."""
+"""Verify and deploy the app and every built realm to Cloudflare Pages."""
 
 import argparse
-import html
-import json
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 
-from sites import load_site, site_names
+from realms import DATA, app_settings, built_realms
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_FILES = (
@@ -19,7 +17,7 @@ PUBLIC_FILES = (
     "data-model.js",
     "navigation.js",
     "reader.js",
-    "site.js",
+    "realm.js",
     "article-preview.js",
     "evidence.js",
     "categories.js",
@@ -35,55 +33,44 @@ PUBLIC_FILES = (
 )
 
 
-# The shared page shell carries neutral text; each release states its own name.
-SHELL_TEXT = (
-    ("<title>Explorer</title>", "<title>{name}</title>"),
-    ('<meta name="apple-mobile-web-app-title" content="Explorer" />', '<meta name="apple-mobile-web-app-title" content="{shortName}" />'),
-    ('content="Browse encyclopedia articles and the connections between them."', 'content="{description}"'),
-)
+# Local reports stay out of releases.
+REALM_FILES = ("realm.json", "links.json", "graph.json")
+REALM_FOLDERS = ("articles", "search")
 
 
-def staging_directory(site):
-    return ROOT / (".artifacts/public" if site.name == "plato" else f".artifacts/public-{site.name}")
-
-
-def prepare(site):
+def prepare():
     source = ROOT / "web"
-    destination = staging_directory(site)
-    required = ("graph.json", "site.json", "partner.json", "search/manifest.json")
-    for name in required:
-        if not (site.output / name).is_file():
-            raise SystemExit("Build the generated data first; see README.md.")
+    destination = ROOT / ".artifacts/public"
+    realms = built_realms()
+    if not realms or not (DATA / "realms.json").is_file():
+        raise SystemExit("Build the generated data first; see README.md.")
+    # Explicit files keep legacy account/login code and any credentials out.
+    files = [(source / name, Path(name)) for name in PUBLIC_FILES]
+    files.append((DATA / "realms.json", Path("data/realms.json")))
+    for realm in realms:
+        for name in REALM_FILES + ("search/manifest.json",):
+            if not (realm.output / name).is_file():
+                raise SystemExit(f"Build the {realm.name} data and search index first; see README.md.")
+        paths = [realm.output / name for name in REALM_FILES]
+        for folder in REALM_FOLDERS:
+            paths.extend(sorted((realm.output / folder).rglob("*.json")))
+        files.extend((path, Path("data") / path.relative_to(DATA)) for path in paths)
     if destination.exists():
         shutil.rmtree(destination)
     destination.mkdir(parents=True)
-    # Explicit files keep legacy account/login code and any credentials out.
-    files = [(source / name, Path(name)) for name in PUBLIC_FILES]
-    files.extend((path, Path("data") / path.relative_to(site.output)) for path in site.output.rglob("*.json"))
     for path, relative in files:
         if path.is_symlink() or any(part.startswith(".") for part in relative.parts):
             raise SystemExit(f"Refusing to publish hidden or linked asset: {relative}")
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(path, target)
-    settings = json.loads(site.config.read_text())
-    shell = (destination / "index.html").read_text()
-    for placeholder, template in SHELL_TEXT:
-        if shell.count(placeholder) != 1:
-            raise SystemExit(f"The page shell no longer contains: {placeholder}")
-        shell = shell.replace(placeholder, template.format(**{field: html.escape(settings[field]) for field in ("name", "shortName", "description")}))
-    (destination / "index.html").write_text(shell)
-    manifest = json.loads((destination / "manifest.webmanifest").read_text())
-    manifest.update(name=settings["name"], short_name=settings["shortName"], description=settings["description"])
-    (destination / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n")
     return destination
 
 
 def deploy(args):
-    site = load_site(args.site)
-    project = args.project_name or site.pages_project
+    project = args.project_name or app_settings()["pagesProject"]
     if args.prepare_only:
-        print(prepare(site))
+        print(prepare())
         return
     if not os.environ.get("CLOUDFLARE_ACCOUNT_ID"):
         raise SystemExit("Set CLOUDFLARE_ACCOUNT_ID to the destination Pages account before deploying.")
@@ -97,7 +84,7 @@ def deploy(args):
     subprocess.run(["npm", "run", "check"], cwd=ROOT, check=True)
     subprocess.run(["node", "--check", "web/navigation.js"], cwd=ROOT, check=True)
     subprocess.run(["npm", "test"], cwd=ROOT, check=True)
-    directory = prepare(site)
+    directory = prepare()
     # Pages rejects custom config paths. A clean working directory prevents it
     # from reading the separate private Worker's wrangler.jsonc or .dev.vars.
     with tempfile.TemporaryDirectory(prefix="explorer-pages-") as working_directory:
@@ -112,7 +99,6 @@ def deploy(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wrangler", default=os.environ.get("WRANGLER_JS"), help="Path to Wrangler's JavaScript entry point")
-    parser.add_argument("--site", default="plato", choices=site_names())
-    parser.add_argument("--project-name", help="Pages project; defaults to the site's own")
+    parser.add_argument("--project-name", help="Pages project; defaults to the one in realms/app.json")
     parser.add_argument("--prepare-only", action="store_true", help="Stage public files without running checks or deploying")
     deploy(parser.parse_args())

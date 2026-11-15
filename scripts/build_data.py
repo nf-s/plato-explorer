@@ -14,7 +14,7 @@ from categories import people_ids, subject
 from extra_nodes import load_extra_nodes
 from fetch_source import ATTRIBUTION_FILENAME
 from layout import communities_and_layout
-from sites import load_site, site_names, write_site_files
+from realms import load_realm, realm_names, write_realm_files, write_realm_index
 from text_processing import MentionMatcher, clean_text, resolve_entry
 
 
@@ -115,25 +115,25 @@ def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
-def build(site, source, output):
+def build(realm, source, output):
     started = time.monotonic()
-    rows = [validate_row(row, site.subjects) for row in pq.read_table(source).to_pylist()]
+    rows = [validate_row(row, realm.subjects) for row in pq.read_table(source).to_pylist()]
     rows.sort(key=lambda row: row["shorturl"])
     ids = {row["shorturl"]: i for i, row in enumerate(rows)}
     canonical_ids = {article_id.lower(): article_id for article_id in ids}
     if len(ids) != len(rows):
         raise ValueError("Duplicate article IDs in the source dataset")
-    people = people_ids(ids, site.people) if site.people else {row["shorturl"] for row in rows if row.get("person")}
+    people = people_ids(ids, realm.people) if realm.people else {row["shorturl"] for row in rows if row.get("person")}
     urls = {row["shorturl"]: row.get("url") or f"https://plato.stanford.edu/entries/{row['shorturl']}/" for row in rows}
     ids_by_url = {row["url"]: row["shorturl"] for row in rows if row.get("url")}
-    aliases = json.loads((site.curation / "aliases.json").read_text())
+    aliases = json.loads((realm.curation / "aliases.json").read_text())
     if not isinstance(aliases, dict):
         raise ValueError("Aliases must be an object")
     for article_id, variants in aliases.items():
         string_list(variants, f"aliases.{article_id}")
         if article_id not in ids:
             raise ValueError(f"Alias refers to an unknown article: {article_id}")
-    rules = json.loads((site.curation / "mention_rules.json").read_text())
+    rules = json.loads((realm.curation / "mention_rules.json").read_text())
     if not isinstance(rules, dict) or set(rules) != {"blocked", "excludedPhrases", "contextual"} or not isinstance(rules["blocked"], dict):
         raise ValueError("Invalid mention rules")
     string_list(rules["excludedPhrases"], "excludedPhrases")
@@ -155,7 +155,7 @@ def build(site, source, output):
         if row.get("blocked"):
             rules["blocked"].setdefault(row["shorturl"], []).extend(row["blocked"])
     titles = {row["shorturl"]: row["title"] for row in rows}
-    extras, keyword_audit = load_extra_nodes(rows, titles, aliases, site.curation / "extra_nodes.json", set(site.subjects))
+    extras, keyword_audit = load_extra_nodes(rows, titles, aliases, realm.curation / "extra_nodes.json", set(realm.subjects))
     for node in extras:
         if node["id"] in ids:
             raise ValueError("Duplicate synthetic node ID")
@@ -255,7 +255,7 @@ def build(site, source, output):
         "method": "Whole-word, case- and accent-insensitive, longest-first titles, curated aliases and curated synthetic names/keywords. Unicode hyphens normalized; known competing names and senses excluded. Preambles and main paragraphs only; self-mentions, headings, TOCs and bibliographies excluded.",
         "biographies": len(people), "mentionedPeople": sum(node["kind"] == "person" for node in extras), "keywords": sum(node["kind"] == "keyword" for node in extras),
     }
-    write_site_files(site, output)
+    write_realm_files(realm, output)
     write_json(output / "graph.json", {"version": 1, "meta": meta, "nodes": nodes, "edges": edges, "communities": communities})
     write_json(output / "word-frequencies.json", keyword_audit.pop("wordFrequencies"))
     write_json(output / "keyword-report.json", keyword_audit)
@@ -265,9 +265,11 @@ def build(site, source, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--site", default="plato", choices=site_names())
+    parser.add_argument("--realm", default=realm_names()[0], choices=realm_names())
     parser.add_argument("--source", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    chosen = load_site(args.site)
+    chosen = load_realm(args.realm)
     build(chosen, (args.source or chosen.source).resolve(), (args.output or chosen.output).resolve())
+    if args.output is None:
+        write_realm_index()

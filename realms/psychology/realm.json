@@ -1,7 +1,6 @@
 {
   "id": "psychology",
-  "name": "Psychology Explorer",
-  "shortName": "Psychology",
+  "name": "Psychology",
   "description": "Browse psychology articles and connections in English Wikipedia.",
   "source": {
     "name": "Wikipedia",

@@ -58,9 +58,10 @@ export function readerParts(block, highlight = null) {
 }
 
 export class ArticleReader {
-  constructor(graph, onNavigate, source) {
+  constructor(graph, onNavigate, source, dataPath) {
     this.graph = graph;
     this.source = source;
+    this.dataPath = dataPath;
     this.ids = new Set(graph.nodes.map((node) => node.id));
     this.dialog = document.getElementById("reader");
     this.content = document.getElementById("reader-content");
@@ -155,7 +156,7 @@ export class ArticleReader {
     let data = this.cache.get(node.id);
     if (data) return data;
     const response = await fetch(
-      `./data/articles/${encodeURIComponent(node.id)}.json`,
+      `${this.dataPath}articles/${encodeURIComponent(node.id)}.json`,
       { signal },
     );
     if (!response.ok) throw new Error("The article file could not be loaded.");

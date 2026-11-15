@@ -6,14 +6,14 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Explorer" />
+    <meta name="apple-mobile-web-app-title" content="Plato" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
     <meta
       name="description"
       content="Browse encyclopedia articles and the connections between them."
     />
-    <title>Explorer</title>
+    <title>Plato Explorer</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
     <link
@@ -28,6 +28,18 @@
     <main class="workspace">
       <section class="graph-panel" aria-label="Encyclopedia network">
         <div class="graph-toolbar">
+          <details id="realm-picker" class="realm-picker" hidden>
+            <summary>
+              <span class="realm-current"
+                ><strong id="realm-name"></strong
+                ><small id="realm-source"></small
+              ></span>
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="m5 8 5 5 5-5" />
+              </svg>
+            </summary>
+            <nav id="realm-menu" class="realm-menu" aria-label="Realms"></nav>
+          </details>
           <div class="view-toggle" role="group" aria-label="Display mode">
             <button id="network-mode" class="active" aria-pressed="true">
               <svg viewBox="0 0 20 20" aria-hidden="true">

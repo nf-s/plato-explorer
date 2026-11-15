@@ -10,7 +10,7 @@ The SEP terms permit individual readers to download and search entries and to sh
 
 ## Wikipedia material
 
-Psychology Explorer reads English Wikipedia articles from Wikimedia's Structured Contents snapshot. Wikipedia text is available under the [Creative Commons Attribution-ShareAlike 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/). The explorer credits Wikipedia contributors, links each article to its Wikipedia page with its revision number, states the licence and notes that lists, tables, images and references were removed or reformatted. Adapted text remains under the same licence. The project has no affiliation with or endorsement by the Wikimedia Foundation. The repository excludes the snapshot and the generated psychology files. [Snapshot](https://huggingface.co/datasets/wikimedia/structured-wikipedia) · [Reusing Wikipedia content](https://en.wikipedia.org/wiki/Wikipedia:Reusing_Wikipedia_content)
+The Psychology realm reads English Wikipedia articles from Wikimedia's Structured Contents snapshot. Wikipedia text is available under the [Creative Commons Attribution-ShareAlike 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/). The explorer credits Wikipedia contributors, links each article to its Wikipedia page with its revision number, states the licence and notes that lists, tables, images and references were removed or reformatted. Adapted text remains under the same licence. The project has no affiliation with or endorsement by the Wikimedia Foundation. The repository excludes the snapshot and the generated psychology files. [Snapshot](https://huggingface.co/datasets/wikimedia/structured-wikipedia) · [Reusing Wikipedia content](https://en.wikipedia.org/wiki/Wikipedia:Reusing_Wikipedia_content)
 
 ## SEP downloads
 

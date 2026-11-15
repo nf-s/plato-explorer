@@ -399,7 +399,7 @@ test("built encyclopedia has consistent totals and a working Nietzsche alias", a
   let raw;
   try {
     raw = await readFile(
-      new URL("../web/data/graph.json", import.meta.url),
+      new URL("../web/data/philosophy/graph.json", import.meta.url),
       "utf8",
     );
   } catch (error) {
