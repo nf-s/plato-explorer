@@ -62,8 +62,8 @@ def load_realm(name):
 
 
 def built_realms(data=DATA):
-    """Realms whose graph exists under the data directory, in menu order."""
-    return [load_realm(name) for name in realm_names() if (data / name / "graph.json").is_file()]
+    """Realms whose graph and article packs exist under the data directory, in menu order."""
+    return [load_realm(name) for name in realm_names() if (data / name / "graph.json").is_file() and (data / name / "packs/manifest.json").is_file()]
 
 
 def write_realm_files(realm, output):
@@ -80,7 +80,8 @@ def write_realm_index(data=DATA):
     entries = []
     for realm in built_realms(data):
         settings = json.loads(realm.config.read_text())
-        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"]})
+        packs = json.loads((data / realm.name / "packs/manifest.json").read_text())["packs"]
+        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"], "articlePacks": packs})
     (data / "realms.json").write_text(json.dumps({"realms": entries}, ensure_ascii=False, indent=2) + "\n")
     return entries
 

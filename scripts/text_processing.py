@@ -8,6 +8,14 @@ from functools import lru_cache
 from urllib.parse import unquote, urljoin, urlparse
 
 
+def fnv1a(text):
+    """The 32-bit FNV-1a hash of the UTF-8 text; the browser computes the same value."""
+    value = 2166136261
+    for byte in text.encode("utf-8"):
+        value = ((value ^ byte) * 16777619) & 0xFFFFFFFF
+    return value
+
+
 def clean_text(text):
     if not isinstance(text, str):
         raise ValueError("Expected text, received " + type(text).__name__)

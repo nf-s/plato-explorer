@@ -27,12 +27,14 @@ function realmList() {
         name: "Philosophy",
         source: "Stanford Encyclopedia of Philosophy",
         sourceShortName: "SEP",
+        articlePacks: 4,
       },
       {
         id: "psychology",
         name: "Psychology",
         source: "Wikipedia",
         sourceShortName: "Wikipedia",
+        articlePacks: 9,
       },
     ],
   });
@@ -90,6 +92,7 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     name: "Philosophy",
     source: "SEP",
     sourceShortName: "SEP",
+    articlePacks: 4,
   };
   for (const data of [
     {},
@@ -97,6 +100,7 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     { realms: [entry, entry] },
     { realms: [{ ...entry, id: "../secrets" }] },
     { realms: [{ ...entry, name: "" }] },
+    { realms: [{ ...entry, articlePacks: 0 }] },
   ])
     assert.throws(() => validateRealms(data), /unsupported format/u);
 });

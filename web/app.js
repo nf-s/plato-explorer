@@ -1083,6 +1083,7 @@ async function start() {
       },
       realm.source,
       data,
+      chosen.articlePacks,
     );
     evidence = new ConnectionEvidence(reader);
     fullText = new FullTextSearch(sourceGraph, reader, data);

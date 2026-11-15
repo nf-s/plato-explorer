@@ -27,11 +27,18 @@ Every realm is stored the same way, as static JSON files under `web/data/<id>/`.
 | `web/data/realms.json`  | The built realms, for the realm menu                            |
 | `<id>/realm.json`       | A copy of the realm's interface settings                        |
 | `<id>/graph.json`       | Nodes, connections and communities. [Data model](data-model.md) |
-| `<id>/articles/<node>.json` | One article with its linked spans                           |
+| `<id>/packs/NNNN.json`  | Articles with their linked spans, several to a file             |
+| `<id>/packs/manifest.json` | The number of packs                                          |
 | `<id>/search/`          | The full-text index. [Search](search.md)                        |
 | `<id>/links.json`       | Shared nodes, as `{other realm: {local node: other node}}`      |
 
-The app needs no database or server code. Build reports, word frequencies and keyword reports are written beside these files for local review and are left out of releases.
+The app needs no database or server code. The build also writes one file per article under `<id>/articles/`, plus build reports, word frequencies and keyword reports. The search builder, link audit and tests read those. They are left out of releases.
+
+### Article packs
+
+A Pages project on the Free plan accepts 20,000 files of up to 25 MiB each, and one file per article would reach that limit at the third realm. `scripts/pack_articles.py` therefore groups articles into packs of about 256 KB. An article's pack is the FNV-1a hash of its ID modulo the pack count, which the reader computes from `realms.json`. Opening an article downloads its pack, and the reader keeps the last eight. `build_data.py` packs after each build. Two realms release about 1,570 files, and a realm of 8,000 Wikipedia articles adds about 700.
+
+R2 object storage was considered. It would need a billing profile on the account and, with no domain on the account, a Function in front of the bucket. Function requests are metered and share a daily allowance with the account's other Workers. Static files on Pages are free and unmetered.
 
 ## Build
 
@@ -56,4 +63,3 @@ python scripts/serve.py
 
 The Wikipedia scripts currently write psychology's intermediate files to fixed paths and estimate subjects from psychology terms. Give them a realm option before using them for a second Wikipedia realm.
 
-A Pages project on the Free plan accepts 20,000 files of up to 25 MiB each. The two realms use about 10,050. A realm of 8,000 articles adds about 8,100, so a fourth realm needs articles packed into shared files first.

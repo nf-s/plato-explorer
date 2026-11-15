@@ -9,6 +9,7 @@ build-report.json
 keyword-report.json
 word-frequencies.json
 articles/
+packs/
 search/
 .artifacts/
 .playwright-mcp/

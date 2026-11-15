@@ -1,17 +1,13 @@
-import { normalize } from "./data-model.js";
+import { fnv1a, normalize } from "./data-model.js";
 
 const SHARDS = 128;
-const encoder = new TextEncoder();
 
 export function searchWords(text) {
   return normalize(text).match(/[\p{L}\p{N}]+/gu) ?? [];
 }
 
 export function shardFor(term) {
-  let value = 2166136261;
-  for (const byte of encoder.encode(term))
-    value = Math.imul(value ^ byte, 16777619) >>> 0;
-  return value % SHARDS;
+  return fnv1a(term) % SHARDS;
 }
 
 function record(value) {

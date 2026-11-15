@@ -73,10 +73,11 @@ test("public staging contains the app and data without private account assets or
     "data/philosophy/realm.json",
     "data/philosophy/links.json",
     "data/philosophy/graph.json",
-    "data/philosophy/articles/nietzsche.json",
+    "data/philosophy/packs/0000.json",
     "data/philosophy/search/manifest.json",
   ])
     assert.ok(names.includes(path), `Missing public asset: ${path}`);
+  assert.ok(names.every((name) => !/\/(?:articles|build-report)/u.test(name)));
   assert.ok(
     names.every(
       (name) =>

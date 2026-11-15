@@ -69,7 +69,7 @@ Node radii increase on a compressed scale with incoming mentions. Edge thickness
 
 ## Article files
 
-`web/data/philosophy/articles/<id>.json` contains the title, original URL, publication text, ordered text blocks, bibliography blocks, related-entry list, original source TOC, and optional attribution from the JSONL snapshot. A paragraph can contain multiple linked spans, as in this invented example.
+The app reads articles from packs that hold several articles each. [Article packs](realms.md#article-packs) The build also writes each article on its own for local tools. `web/data/philosophy/articles/<id>.json` contains the title, original URL, publication text, ordered text blocks, bibliography blocks, related-entry list, original source TOC, and optional attribution from the JSONL snapshot. A paragraph can contain multiple linked spans, as in this invented example.
 
 ```json
 {

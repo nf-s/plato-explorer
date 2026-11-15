@@ -30,7 +30,7 @@ Read the [working instructions](../AGENTS.md), then use the relevant entry below
 
 ## Release record and verification
 
-On 15 November 2026 the two explorers were merged into one app with a realm menu. The change passed 98 JavaScript and 39 Python tests and browser checks of both realms at desktop, 375px and 320px widths. The combined release stages 10,054 files. It had not been deployed when this note was written, and the separate psychology Pages project still served the earlier build.
+On 15 November 2026 the two explorers were merged into one app with a realm menu. The change passed 98 JavaScript and 39 Python tests and browser checks of both realms at desktop, 375px and 320px widths. It was released to `plato-network` the same day and both realms were checked live. Articles were then packed into shared files, which cut the staged release from 10,054 files to 1,567. The separate psychology Pages project still serves its earlier build.
 
 On 13 November 2026 the first psychology build held 7,994 articles and 278,274 connections in 8,147 uploaded files, with a 12.6 MB graph. It passed 97 JavaScript and 39 Python tests and browser checks of the graph, mentions, reader, search and a 375px layout. The refactored Plato build produced byte-identical graph and article files.
 

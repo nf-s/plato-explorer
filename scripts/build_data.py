@@ -14,6 +14,7 @@ from categories import people_ids, subject
 from extra_nodes import load_extra_nodes
 from fetch_source import ATTRIBUTION_FILENAME
 from layout import communities_and_layout
+from pack_articles import pack
 from realms import load_realm, realm_names, write_realm_files, write_realm_index
 from text_processing import MentionMatcher, clean_text, resolve_entry
 
@@ -257,6 +258,7 @@ def build(realm, source, output):
     }
     write_realm_files(realm, output)
     write_json(output / "graph.json", {"version": 1, "meta": meta, "nodes": nodes, "edges": edges, "communities": communities})
+    pack(output)
     write_json(output / "word-frequencies.json", keyword_audit.pop("wordFrequencies"))
     write_json(output / "keyword-report.json", keyword_audit)
     write_json(output / "build-report.json", {**meta, "ambiguousTerms": matcher.ambiguous, "unresolvedEntries": unresolved, "emptyArticles": empty_articles, "attributions": len(attributions), "communities": communities})

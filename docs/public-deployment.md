@@ -8,9 +8,9 @@ The public project has no Pages Functions, D1 bindings, environment variables, o
 
 ## Realms
 
-One release carries the app and every built realm. The script stages `.artifacts/public/` with the frontend allowlist, `data/realms.json` and each realm's `realm.json`, `links.json`, `graph.json`, `articles/` and `search/`. Local build reports are left out. The Pages project comes from `realms/app.json`. Run `scripts/build_realm_links.py` before staging. [Realms](realms.md)
+One release carries the app and every built realm. The script stages `.artifacts/public/` with the frontend allowlist, `data/realms.json` and each realm's `realm.json`, `links.json`, `graph.json`, `packs/` and `search/`. Per-article files and local build reports are left out. The Pages project comes from `realms/app.json`. Run `scripts/build_realm_links.py` before staging. [Realms](realms.md)
 
-Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. Two realms stage about 10,050 files.
+Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. Articles are packed into shared files, so two realms stage about 1,570 files. [Article packs](realms.md#article-packs)
 
 The psychology realm was first released to a separate Pages project, `psyche-network`. Retire or redirect it once the combined app is released.
 
@@ -74,7 +74,7 @@ Check unauthenticated GET and HEAD requests against both canonical and deploymen
 
 - `/`, `/app.js`, `/navigation.js`, and `/styles.css`
 - `/robots.txt`, `/manifest.webmanifest`, and the Apple touch and manifest icons
-- `/data/realms.json`, then for each realm `/data/<realm>/realm.json`, `/data/<realm>/graph.json`, an encoded graph path, an article such as `/data/philosophy/articles/nietzsche.json`, `/data/<realm>/search/manifest.json`, and a search shard.
+- `/data/realms.json`, then for each realm `/data/<realm>/realm.json`, `/data/<realm>/graph.json`, an encoded graph path, an article pack such as `/data/philosophy/packs/0000.json`, `/data/<realm>/search/manifest.json`, and a search shard.
 
 Responses must carry the expected crawl and security headers and load without authentication redirects or session cookies. `/index.html` may redirect to `/` because Pages canonicalizes HTML paths. Compare deployed content with the freshly staged files where practical. Confirm `robots.txt` disallows `/`. Cloudflare's edge has rejected Python's default urllib user agent with error 1010. A browser check distinguished this edge response from a failing app in the original release.
 

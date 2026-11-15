@@ -194,7 +194,12 @@ test("public reader reports an unavailable article without redirecting to login"
   }));
   await assert.rejects(
     ArticleReader.prototype.load.call(
-      { cache: new Map(), dataPath: "./data/philosophy/" },
+      {
+        cache: new Map(),
+        packs: new Map(),
+        dataPath: "./data/philosophy/",
+        articlePacks: 4,
+      },
       { id: "foucault", article: true },
     ),
     /article file could not be loaded/,
@@ -224,7 +229,10 @@ test("Homosexuality evidence accounts for every Foucault match in the corpus", a
   assert.ok(edge);
   const article = JSON.parse(
     await readFile(
-      new URL("../web/data/philosophy/articles/homosexuality.json", import.meta.url),
+      new URL(
+        "../web/data/philosophy/articles/homosexuality.json",
+        import.meta.url,
+      ),
       "utf8",
     ),
   );

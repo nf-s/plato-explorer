@@ -270,7 +270,10 @@ test("generated index finds a term in an article's main text with no title match
   );
   const article = JSON.parse(
     await readFile(
-      new URL("../web/data/philosophy/articles/foucault.json", import.meta.url),
+      new URL(
+        "../web/data/philosophy/articles/foucault.json",
+        import.meta.url,
+      ),
       "utf8",
     ),
   );

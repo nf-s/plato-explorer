@@ -32,17 +32,23 @@ export function validateRealms(data) {
         REALM_ID.test(entry.id) &&
         ["name", "source", "sourceShortName"].every((field) =>
           text(entry[field]),
-        ),
+        ) &&
+        Number.isSafeInteger(entry.articlePacks) &&
+        entry.articlePacks >= 1 &&
+        entry.articlePacks <= 10000,
     ) ||
     new Set(data.realms.map((entry) => entry.id)).size !== data.realms.length
   )
     throw new Error("The realm list has an unsupported format.");
-  return data.realms.map(({ id, name, source, sourceShortName }) => ({
-    id,
-    name,
-    source,
-    sourceShortName,
-  }));
+  return data.realms.map(
+    ({ id, name, source, sourceShortName, articlePacks }) => ({
+      id,
+      name,
+      source,
+      sourceShortName,
+      articlePacks,
+    }),
+  );
 }
 
 // Addresses without a known realm, including those shared before realms

@@ -35,7 +35,7 @@ PUBLIC_FILES = (
 
 # Local reports stay out of releases.
 REALM_FILES = ("realm.json", "links.json", "graph.json")
-REALM_FOLDERS = ("articles", "search")
+REALM_FOLDERS = ("packs", "search")
 
 
 def prepare():
@@ -48,7 +48,7 @@ def prepare():
     files = [(source / name, Path(name)) for name in PUBLIC_FILES]
     files.append((DATA / "realms.json", Path("data/realms.json")))
     for realm in realms:
-        for name in REALM_FILES + ("search/manifest.json",):
+        for name in REALM_FILES + ("packs/manifest.json", "search/manifest.json"):
             if not (realm.output / name).is_file():
                 raise SystemExit(f"Build the {realm.name} data and search index first; see README.md.")
         paths = [realm.output / name for name in REALM_FILES]

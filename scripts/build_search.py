@@ -9,6 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 from realms import load_realm, realm_names
+from text_processing import fnv1a
 
 SHARDS = 128
 TOKEN = re.compile(r"[^\W_]+", re.UNICODE)
@@ -20,10 +21,7 @@ def words(text):
 
 
 def shard_for(term):
-    value = 2166136261
-    for byte in term.encode("utf-8"):
-        value = ((value ^ byte) * 16777619) & 0xFFFFFFFF
-    return value % SHARDS
+    return fnv1a(term) % SHARDS
 
 
 def read_article(path, expected_id):

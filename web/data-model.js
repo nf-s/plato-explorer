@@ -364,6 +364,16 @@ export function searchArticles(
   return matches.slice(0, limit).map((match) => match.index);
 }
 
+const encoder = new TextEncoder();
+
+// The 32-bit FNV-1a hash of the UTF-8 text; the build scripts compute the same value.
+export function fnv1a(text) {
+  let value = 2166136261;
+  for (const byte of encoder.encode(text))
+    value = Math.imul(value ^ byte, 16777619) >>> 0;
+  return value;
+}
+
 export function element(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
