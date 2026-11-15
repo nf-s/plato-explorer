@@ -21,7 +21,7 @@ The staged `_routes.json` lists `/data/<realm>/articles/*` for each built realm.
 
 The Pages Free plan accepts 20,000 files per project and 25 MiB per file. The script refuses to stage more files, and a release holds about 130 per realm.
 
-The psychology realm was first released to a separate Pages project, `psyche-network`. Retire or redirect it once the combined app is released.
+The psychology realm was first released to a separate Pages project, `psyche-network`. That project now holds one `_redirects` rule, `/* <app address>/?realm=psychology 301`, so its old addresses open the Psychology realm. A browser keeps the `#/node` part of an old address across the redirect. Its earlier deployment is still stored in the project and is reachable only by its own deployment address.
 
 ### One-time setup
 
