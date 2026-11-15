@@ -15,6 +15,15 @@ function respond(body, status, headers = new Headers()) {
   return new Response(body, { status, headers });
 }
 
+// R2 rejects a conditional header it cannot parse. The article is then sent in full.
+async function read(bucket, key, headers) {
+  try {
+    return await bucket.get(key, { onlyIf: headers });
+  } catch {
+    return bucket.get(key);
+  }
+}
+
 export default {
   async fetch(request, env) {
     const match = ARTICLE.exec(new URL(request.url).pathname);
@@ -25,7 +34,7 @@ export default {
     const object =
       request.method === "HEAD"
         ? await env.ARTICLES.head(key)
-        : await env.ARTICLES.get(key, { onlyIf: request.headers });
+        : await read(env.ARTICLES, key, request.headers);
     if (object === null) return respond("Not found", 404);
     const headers = new Headers();
     object.writeHttpMetadata(headers);

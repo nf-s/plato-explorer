@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -44,7 +45,7 @@ class ArticleUploadTests(unittest.TestCase):
 
     def test_the_function_reads_the_binding_the_release_declares(self):
         source = (deploy_public.ROOT / "web/_worker.js").read_text()
-        self.assertIn(f"env.{deploy_public.ARTICLES_BINDING}.get(", source)
+        self.assertEqual(set(re.findall(r"env\.([A-Z_]+)", source)), {"ASSETS", deploy_public.ARTICLES_BINDING})
         self.assertIn("_worker.js", deploy_public.PUBLIC_FILES)
 
 

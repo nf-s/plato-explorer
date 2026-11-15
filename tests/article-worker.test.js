@@ -30,7 +30,10 @@ function environment() {
       },
       async get(key, options) {
         if (!find(key)) return null;
-        return options.onlyIf.get("If-None-Match") === ETAG
+        const condition = options ? options.onlyIf.get("If-None-Match") : null;
+        if (condition !== null && !condition.startsWith('"'))
+          throw new Error("invalid conditional header");
+        return condition === ETAG
           ? stored
           : { ...stored, body: '{"id":"nietzsche"}' };
       },
@@ -78,6 +81,15 @@ test("a current copy is confirmed without sending the article again", async () =
   assert.equal(response.status, 304);
   assert.equal(await response.text(), "");
   assert.equal(response.headers.get("ETag"), ETAG);
+});
+
+test("a conditional header the bucket cannot parse gets the whole article", async () => {
+  const env = environment();
+  const response = await ask(env, "/data/philosophy/articles/nietzsche.json", {
+    headers: { "If-None-Match": "garbage" },
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { id: "nietzsche" });
 });
 
 test("HEAD answers without a body and other methods are refused", async () => {
