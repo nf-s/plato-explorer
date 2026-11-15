@@ -1,0 +1,63 @@
+{
+  "wikiProjects": [
+    "{importance}-importance Economics articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
+  "wikidataSeeds": [
+    {
+      "name": "economist",
+      "pattern": "?item wdt:P106 wd:Q188094",
+      "person": true
+    }
+  ],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 3,
+    "seedLinks": 3,
+    "neighbourLinks": 10,
+    "share": 0.2
+  },
+  "subjects": {
+    "Macroeconomics & growth": {
+      "terms": "macroeconom\\w*|inflation|deflation|unemployment|gdp|gross domestic product|economic growth|business cycle\\w*|recession\\w*|great depression|aggregate|stimulus|stagflation|national income",
+      "seeds": []
+    },
+    "Money, banking & finance": {
+      "terms": "money|monetary|bank\\w*|financ\\w*|currenc\\w*|credit|interest rate\\w*|bond\\w*|stock\\w*|securit\\w*|invest\\w*|insurance|hedge|derivative\\w*|exchange rate\\w*|bubble\\w*|gold standard",
+      "seeds": []
+    },
+    "Markets & behaviour": {
+      "terms": "microeconom\\w*|market\\w*|price\\w*|pricing|supply|demand|competition|monopol\\w*|oligopol\\w*|consumer\\w*|firm\\w*|utility|game theory|auction\\w*|elasticity|behaviou?ral|incentive\\w*|externalit\\w*",
+      "seeds": []
+    },
+    "Trade & development": {
+      "terms": "trade|tariff\\w*|globali[sz]ation|development|developing|poverty|export\\w*|import\\w*|international|aid|imperialism|colonial\\w*|emerging",
+      "seeds": []
+    },
+    "Labour & welfare": {
+      "terms": "labou?r|wage\\w*|employment|worker\\w*|union\\w*|welfare|inequality|pension\\w*|household\\w*|human capital|migration|minimum wage|gender",
+      "seeds": []
+    },
+    "Public policy & taxation": {
+      "terms": "tax\\w*|public|government|regulat\\w*|policy|budget\\w*|deficit\\w*|debt|subsid\\w*|privati[sz]ation|nationali[sz]ation|austerity|antitrust|planning",
+      "seeds": []
+    },
+    "Schools & history": {
+      "terms": "keynes\\w*|marx\\w*|classical|neoclassical|austrian school|chicago school|mercantil\\w*|physiocra\\w*|institutional\\w*|history|historical|capitalis\\w*|socialis\\w*|communis\\w*|political economy|liberalism",
+      "seeds": []
+    },
+    "Methods & theory": {
+      "terms": "econometric\\w*|statistic\\w*|model\\w*|theorem|index|indices|mathematical|equilibrium|measurement|regression|forecast\\w*|optimi[sz]ation|theory of|hypothesis",
+      "seeds": []
+    },
+    "Business & industry": {
+      "terms": "business\\w*|compan\\w*|corporat\\w*|industr\\w*|manufactur\\w*|agricultur\\w*|energy|oil|technology|innovation|entrepreneur\\w*|management|accounting|marketing|retail",
+      "seeds": []
+    }
+  }
+}

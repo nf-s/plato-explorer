@@ -194,12 +194,7 @@ test("public reader reports an unavailable article without redirecting to login"
   }));
   await assert.rejects(
     ArticleReader.prototype.load.call(
-      {
-        cache: new Map(),
-        packs: new Map(),
-        dataPath: "./data/philosophy/",
-        articlePacks: 4,
-      },
+      { cache: new Map(), dataPath: "./data/philosophy/" },
       { id: "foucault", article: true },
     ),
     /article file could not be loaded/,

@@ -1,13 +1,13 @@
 {
-  "wikiProject": {
-    "category": "{importance}-importance psychology articles",
-    "importance": [
-      "Top",
-      "High",
-      "Mid",
-      "Low"
-    ]
-  },
+  "wikiProjects": [
+    "{importance}-importance psychology articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
   "wikidataSeeds": [
     {
       "name": "psychologist",
@@ -64,5 +64,62 @@
       "pattern": "?item wdt:P31/wdt:P279* wd:Q2866472",
       "person": false
     }
-  ]
+  ],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 3,
+    "seedLinks": 3,
+    "neighbourLinks": 10,
+    "share": 0.2
+  },
+  "subjects": {
+    "Clinical & disorders": {
+      "terms": "disorder\\w*|syndrome\\w*|psychiatr\\w*|psychopatholog\\w*|schizo\\w*|depress\\w*|anxiety|phobia\\w*|mania|bipolar|autis\\w*|dementia|psychosis|psychotic|addict\\w*|trauma\\w*|suicid\\w*|symptom\\w*|diagnos\\w*|mental illness|mental health|abuse|paraphilia\\w*|delusion\\w*|hallucinat\\w*",
+      "seeds": [
+        "mental disorder"
+      ]
+    },
+    "Therapy & treatment": {
+      "terms": "therap\\w*|psychotherap\\w*|counsel\\w*|treatment\\w*|intervention\\w*|antidepressant\\w*|antipsychotic\\w*|medication\\w*|rehabilitation|mindfulness|meditation|hypno\\w*",
+      "seeds": [
+        "psychotherapy"
+      ]
+    },
+    "Cognition & perception": {
+      "terms": "cognit\\w*|memory|attention|percept\\w*|illusion\\w*|bias\\w*|heuristic\\w*|reasoning|decision\\w*|judg\\w*|language|psycholinguist\\w*|thinking|thought|intelligence|problem solving|conscious\\w*|recall|recognition",
+      "seeds": [
+        "cognitive bias"
+      ]
+    },
+    "Emotion & motivation": {
+      "terms": "emotion\\w*|affect|feeling\\w*|mood|motivat\\w*|desire|happiness|fear|anger|love|grief|pleasure|pain|stress|well-being|empathy|shame|guilt|jealousy",
+      "seeds": [
+        "emotion"
+      ]
+    },
+    "Social & personality": {
+      "terms": "social|personality|trait\\w*|attitude\\w*|prejudice|stereotyp\\w*|group\\w*|conformity|persuasion|identity|self|interpersonal|relationship\\w*|attraction|aggression|altruism|cultur\\w*|gender|sexual\\w*|leadership|organizational|industrial",
+      "seeds": [
+        "personality trait"
+      ]
+    },
+    "Development & learning": {
+      "terms": "development\\w*|child\\w*|infant\\w*|adolescen\\w*|aging|learning|educat\\w*|school\\w*|parent\\w*|attachment|conditioning|reinforcement|teaching|student\\w*",
+      "seeds": []
+    },
+    "Brain & biology": {
+      "terms": "neuro\\w*|brain|cortex|neuron\\w*|genetic\\w*|evolution\\w*|biolog\\w*|physiolog\\w*|hormone\\w*|sleep|dopamine|serotonin|amygdala|hippocamp\\w*|sensory|vision|visual|auditory|psychophysi\\w*",
+      "seeds": []
+    },
+    "Methods & assessment": {
+      "terms": "test\\w*|scale\\w*|questionnaire\\w*|inventory|assessment\\w*|measure\\w*|psychometric\\w*|statistic\\w*|experiment\\w*|method\\w*|validity|reliability|survey\\w*|journal|replication",
+      "seeds": []
+    },
+    "Schools & history": {
+      "terms": "psychoanaly\\w*|freud\\w*|jung\\w*|behaviou?ris\\w*|gestalt|humanistic|existential\\w*|phenomenolog\\w*|history|philosoph\\w*|association|society|institute",
+      "seeds": [
+        "defence mechanism"
+      ]
+    }
+  }
 }

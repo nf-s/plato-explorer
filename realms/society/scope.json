@@ -1,0 +1,69 @@
+{
+  "wikiProjects": [
+    "{importance}-importance sociology articles",
+    "{importance}-importance Anthropology articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
+  "wikidataSeeds": [
+    {
+      "name": "sociologist",
+      "pattern": "?item wdt:P106 wd:Q2306091",
+      "person": true
+    },
+    {
+      "name": "anthropologist",
+      "pattern": "?item wdt:P106 wd:Q4773904",
+      "person": true
+    }
+  ],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 3,
+    "seedLinks": 3,
+    "neighbourLinks": 10,
+    "share": 0.2
+  },
+  "subjects": {
+    "Class & inequality": {
+      "terms": "class|stratification|inequalit\\w*|poverty|social mobility|status|caste|elite\\w*|privilege|wealth|underclass|homeless\\w*",
+      "seeds": []
+    },
+    "Culture & belief": {
+      "terms": "cultur\\w*|ritual\\w*|religio\\w*|myth\\w*|symbol\\w*|tradition\\w*|custom\\w*|belief\\w*|taboo\\w*|folklore|magic|witchcraft|shaman\\w*|art|music",
+      "seeds": []
+    },
+    "Kinship, family & gender": {
+      "terms": "kinship|famil\\w*|marriage|gender|sex\\w*|feminis\\w*|women|masculin\\w*|parent\\w*|child\\w*|descent|incest|patriarch\\w*|matriarch\\w*|queer",
+      "seeds": []
+    },
+    "Race, ethnicity & peoples": {
+      "terms": "race|racial|racis\\w*|ethnic\\w*|indigenous|tribe\\w*|tribal|peoples?|nation\\w*|migration|immigra\\w*|diaspora|minorit\\w*|colonial\\w*|aboriginal",
+      "seeds": []
+    },
+    "Power, conflict & deviance": {
+      "terms": "power|state|politic\\w*|social movement\\w*|protest\\w*|revolution\\w*|conflict|war|violence|law|crime|criminolog\\w*|devian\\w*|punish\\w*|prison\\w*|authorit\\w*|ideolog\\w*",
+      "seeds": []
+    },
+    "Economy, work & cities": {
+      "terms": "work|labou?r|organi[sz]ation\\w*|bureaucra\\w*|capitalis\\w*|econom\\w*|consum\\w*|industr\\w*|urban\\w*|city|cities|rural|globali[sz]ation|moderni[sz]ation|technolog\\w*",
+      "seeds": []
+    },
+    "Human origins & archaeology": {
+      "terms": "evolution\\w*|archaeolog\\w*|prehistor\\w*|homin\\w*|homo|fossil\\w*|paleo\\w*|palaeo\\w*|primat\\w*|biological anthropology|physical anthropology|genetic\\w*|stone age|neolithic|hunter-gatherer\\w*",
+      "seeds": []
+    },
+    "Language & communication": {
+      "terms": "language\\w*|linguist\\w*|communication|media|discourse|semiotic\\w*|conversation|narrative\\w*|internet|network\\w*",
+      "seeds": []
+    },
+    "Theory & methods": {
+      "terms": "theor\\w*|method\\w*|ethnograph\\w*|survey\\w*|statistic\\w*|fieldwork|functionalis\\w*|structuralis\\w*|positivis\\w*|interactionis\\w*|sociology of|paradigm|qualitative|quantitative|demograph\\w*",
+      "seeds": []
+    }
+  }
+}

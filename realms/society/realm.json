@@ -1,0 +1,71 @@
+{
+  "id": "society",
+  "name": "Society",
+  "description": "Browse sociology and anthropology articles and connections in English Wikipedia.",
+  "source": {
+    "name": "Wikipedia",
+    "shortName": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Portal:Society",
+    "hosts": [
+      "en.wikipedia.org"
+    ],
+    "footer": "Wikipedia text · CC BY-SA 4.0",
+    "articleRights": "Text by Wikipedia contributors, available under the Creative Commons Attribution-ShareAlike 4.0 licence. The original article links to its authors and history. ",
+    "readerNotice": "Links and highlights were added by this visualization, which is not affiliated with the Wikimedia Foundation. ",
+    "copyrightUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "about": {
+    "copyright": [
+      "Article text comes from English Wikipedia and its contributors, under the Creative Commons Attribution-ShareAlike 4.0 licence. The reader shows each article's revision and links to the original, where its authors and history are listed. Tables, images, references and infoboxes are omitted. Detected links and highlights are additions.",
+      "This visualization is independent and is not affiliated with or endorsed by the Wikimedia Foundation. "
+    ],
+    "copyrightLink": "CC BY-SA 4.0 licence",
+    "commonTermExamples": "Society, Human, and Culture",
+    "subjectNote": "they are not Wikipedia categories"
+  },
+  "defaults": {
+    "minimumMentions": 5
+  },
+  "subjects": [
+    [
+      "Class & inequality",
+      "#b97559"
+    ],
+    [
+      "Culture & belief",
+      "#a57290"
+    ],
+    [
+      "Kinship, family & gender",
+      "#638f9e"
+    ],
+    [
+      "Race, ethnicity & peoples",
+      "#b29854"
+    ],
+    [
+      "Power, conflict & deviance",
+      "#7b75a6"
+    ],
+    [
+      "Economy, work & cities",
+      "#6887b3"
+    ],
+    [
+      "Human origins & archaeology",
+      "#8a8fb5"
+    ],
+    [
+      "Language & communication",
+      "#998678"
+    ],
+    [
+      "Theory & methods",
+      "#a48a6a"
+    ],
+    [
+      "Other / interdisciplinary",
+      "#94a0ac"
+    ]
+  ]
+}

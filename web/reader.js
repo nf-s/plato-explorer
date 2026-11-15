@@ -1,4 +1,4 @@
-import { element, fnv1a, validateArticle } from "./data-model.js";
+import { element, validateArticle } from "./data-model.js";
 import { ArticlePreview } from "./article-preview.js";
 
 function validHighlight(block, highlight) {
@@ -57,33 +57,11 @@ export function readerParts(block, highlight = null) {
   return parts;
 }
 
-function record(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-// Articles are stored in shared pack files, chosen by a hash of the article ID.
-export function packFor(id, packs) {
-  return fnv1a(id) % packs;
-}
-
-export function validatePack(data, index) {
-  if (
-    !record(data) ||
-    data.version !== 1 ||
-    data.pack !== index ||
-    !record(data.articles)
-  )
-    throw new Error("The article file has an unsupported format.");
-  return data.articles;
-}
-
 export class ArticleReader {
-  constructor(graph, onNavigate, source, dataPath, articlePacks) {
+  constructor(graph, onNavigate, source, dataPath) {
     this.graph = graph;
     this.source = source;
     this.dataPath = dataPath;
-    this.articlePacks = articlePacks;
-    this.packs = new Map();
     this.ids = new Set(graph.nodes.map((node) => node.id));
     this.dialog = document.getElementById("reader");
     this.content = document.getElementById("reader-content");
@@ -177,23 +155,12 @@ export class ArticleReader {
       throw new Error("This node has no article in this snapshot.");
     let data = this.cache.get(node.id);
     if (data) return data;
-    const index = packFor(node.id, this.articlePacks);
-    let articles = this.packs.get(index);
-    if (!articles) {
-      const response = await fetch(
-        `${this.dataPath}packs/${String(index).padStart(4, "0")}.json`,
-        { signal },
-      );
-      if (!response.ok)
-        throw new Error("The article file could not be loaded.");
-      articles = validatePack(await response.json(), index);
-      if (this.packs.size >= 8)
-        this.packs.delete(this.packs.keys().next().value);
-      this.packs.set(index, articles);
-    }
-    if (!Object.hasOwn(articles, node.id))
-      throw new Error("The article file could not be loaded.");
-    data = validateArticle(articles[node.id], node.id, this.ids);
+    const response = await fetch(
+      `${this.dataPath}articles/${encodeURIComponent(node.id)}.json`,
+      { signal },
+    );
+    if (!response.ok) throw new Error("The article file could not be loaded.");
+    data = validateArticle(await response.json(), node.id, this.ids);
     if (this.cache.size >= 12)
       this.cache.delete(this.cache.keys().next().value);
     this.cache.set(node.id, data);

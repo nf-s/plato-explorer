@@ -16,7 +16,7 @@ ARTICLE_COLUMNS = ["name", "identifier", "url", "abstract", "description", "date
 def shards(directory):
     paths = sorted(directory.glob("enwiki_namespace_0_*.parquet"), key=lambda path: int(path.stem.rsplit("_", 1)[1]))
     if not paths:
-        raise SystemExit(f"No snapshot shards in {directory}; see docs/psychology.md.")
+        raise SystemExit(f"No snapshot shards in {directory}; see docs/wikipedia-realms.md.")
     return paths
 
 
@@ -102,11 +102,12 @@ if __name__ == "__main__":
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("index")
     copy = commands.add_parser("extract")
-    copy.add_argument("--titles", type=Path, required=True, help="JSON list or object keyed by article title")
-    copy.add_argument("--output", type=Path, required=True)
+    copy.add_argument("--realm", required=True)
+    copy.add_argument("--titles", required=True, choices=["candidates", "neighbours"], help="which of the realm's title lists to copy")
     args = parser.parse_args()
     snapshot = args.snapshot.resolve()
     if args.command == "index":
         build_index(snapshot, snapshot / "index.parquet")
     else:
-        extract(snapshot, snapshot / "index.parquet", json.loads(args.titles.read_text()), args.output.resolve())
+        work = snapshot / args.realm
+        extract(snapshot, snapshot / "index.parquet", json.loads((work / f"{args.titles}.json").read_text()), work / f"{args.titles}.jsonl")

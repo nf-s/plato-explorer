@@ -1,0 +1,58 @@
+{
+  "wikiProjects": [
+    "{importance}-importance Mythology articles",
+    "{importance}-importance Folklore articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
+  "wikidataSeeds": [],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 3,
+    "seedLinks": 3,
+    "neighbourLinks": 10,
+    "share": 0.2
+  },
+  "subjects": {
+    "Greek & Roman": {
+      "terms": "greek|greece|roman|rome|hellen\\w*|olymp\\w*|homer\\w*|latin|etruscan|trojan|troy|titan\\w*|nymph\\w*|ovid\\w*|hesiod\\w*",
+      "seeds": []
+    },
+    "Norse & Germanic": {
+      "terms": "norse|germanic|viking\\w*|scandinav\\w*|anglo-saxon|icelandic|edda\\w*|æsir|aesir|valkyr\\w*|saga\\w*|odin|thor",
+      "seeds": []
+    },
+    "Celtic & Arthurian": {
+      "terms": "celtic|irish|ireland|welsh|wales|arthur\\w*|gaul\\w*|gaelic|scottish|breton|tuatha|druid\\w*|mabinogi\\w*|grail",
+      "seeds": []
+    },
+    "Egyptian & Near Eastern": {
+      "terms": "egypt\\w*|mesopotam\\w*|sumer\\w*|babylon\\w*|akkadian|assyrian|canaan\\w*|hittite|persian|iranian|zoroastr\\w*|ugarit\\w*|phoenician|hebrew|biblical|arabian",
+      "seeds": []
+    },
+    "South & East Asian": {
+      "terms": "hindu\\w*|india\\w*|vedic|buddhis\\w*|chinese|china|japanese|japan|shinto|korean|sanskrit|tibetan|philippine|indonesian|thai|vietnamese|puran\\w*|mahabharata|ramayana",
+      "seeds": []
+    },
+    "Americas, Africa & Oceania": {
+      "terms": "aztec|maya\\w*|inca\\w*|native american|mesoamerican|african|yoruba|polynesian|m[aā]ori|hawaiian|aboriginal|australian|inuit|navajo|lakota|haitian|vodou",
+      "seeds": []
+    },
+    "Slavic, Baltic & Uralic": {
+      "terms": "slavic|baltic|finnish|finnic|hungarian|russian|lithuanian|latvian|estonian|polish|kalevala|basque|armenian|georgian|turkic|mongol\\w*",
+      "seeds": []
+    },
+    "Creatures & folklore": {
+      "terms": "creature\\w*|monster\\w*|dragon\\w*|giant\\w*|spirit\\w*|fairy|fairies|folklore|folk tale\\w*|fairy tale\\w*|legend\\w*|ghost\\w*|demon\\w*|cryptid\\w*|werewol\\w*|vampire\\w*|witch\\w*|urban legend\\w*|mermaid\\w*|trickster\\w*",
+      "seeds": []
+    },
+    "Themes & study": {
+      "terms": "comparative|mythograph\\w*|motif\\w*|creation myth\\w*|flood myth\\w*|afterlife|underworld|cosmolog\\w*|archetype\\w*|hero's journey|monomyth|mythology of|study of|euhemer\\w*|ritual\\w*|symbol\\w*|folklorist\\w*|theory",
+      "seeds": []
+    }
+  }
+}

@@ -62,8 +62,8 @@ def load_realm(name):
 
 
 def built_realms(data=DATA):
-    """Realms whose graph and article packs exist under the data directory, in menu order."""
-    return [load_realm(name) for name in realm_names() if (data / name / "graph.json").is_file() and (data / name / "packs/manifest.json").is_file()]
+    """Realms whose graph exists under the data directory, in menu order."""
+    return [load_realm(name) for name in realm_names() if (data / name / "graph.json").is_file()]
 
 
 def write_realm_files(realm, output):
@@ -75,15 +75,22 @@ def write_realm_files(realm, output):
         links.write_text("{}\n")
 
 
-def write_realm_index(data=DATA):
-    """List the built realms for the app's realm menu."""
+def realm_index(addresses=None, data=DATA):
+    """List the built realms for the app's realm menu, with the address of each realm's data.
+
+    Without addresses the data is beside the app, as in a local build."""
     entries = []
     for realm in built_realms(data):
         settings = json.loads(realm.config.read_text())
-        packs = json.loads((data / realm.name / "packs/manifest.json").read_text())["packs"]
-        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"], "articlePacks": packs})
-    (data / "realms.json").write_text(json.dumps({"realms": entries}, ensure_ascii=False, indent=2) + "\n")
-    return entries
+        address = addresses[realm.name] if addresses else f"./data/{realm.name}/"
+        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"], "data": address})
+    return {"realms": entries}
+
+
+def write_realm_index(data=DATA):
+    index = realm_index(data=data)
+    (data / "realms.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n")
+    return index["realms"]
 
 
 if __name__ == "__main__":

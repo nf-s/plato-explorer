@@ -1,4 +1,11 @@
 {
   "pagesProject": "plato-network",
-  "realms": ["philosophy", "psychology"]
+  "realms": [
+    "philosophy",
+    "psychology",
+    "economics",
+    "society",
+    "religion",
+    "mythology"
+  ]
 }

@@ -27,14 +27,14 @@ function realmList() {
         name: "Philosophy",
         source: "Stanford Encyclopedia of Philosophy",
         sourceShortName: "SEP",
-        articlePacks: 4,
+        data: "./data/philosophy/",
       },
       {
         id: "psychology",
         name: "Psychology",
         source: "Wikipedia",
         sourceShortName: "Wikipedia",
-        articlePacks: 9,
+        data: "https://realm-data.example/",
       },
     ],
   });
@@ -50,6 +50,15 @@ test("both realms ship valid interface settings with distinct sources", async ()
     () => validateRealm(philosophy, "psychology"),
     /unsupported format/u,
   );
+});
+
+test("every realm the app lists ships valid interface settings", async () => {
+  const app = JSON.parse(
+    await readFile(new URL("realms/app.json", root), "utf8"),
+  );
+  assert.ok(app.realms.length >= 2);
+  for (const id of app.realms)
+    assert.equal(validateRealm(await settings(id), id).id, id);
 });
 
 test("realm settings reject missing copy, unsafe links and malformed colours", async () => {
@@ -83,7 +92,8 @@ test("the address chooses a realm and earlier addresses open the default", () =>
     realmHref(realms, "psychology", "music-psychology"),
     "./?realm=psychology#/music-psychology",
   );
-  assert.equal(dataPath(realms[1]), "./data/psychology/");
+  assert.equal(dataPath(realms[0]), "./data/philosophy/");
+  assert.equal(dataPath(realms[1]), "https://realm-data.example/");
 });
 
 test("the realm list rejects empty, duplicate and unsafe entries", () => {
@@ -92,7 +102,7 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     name: "Philosophy",
     source: "SEP",
     sourceShortName: "SEP",
-    articlePacks: 4,
+    data: "./data/philosophy/",
   };
   for (const data of [
     {},
@@ -100,7 +110,10 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     { realms: [entry, entry] },
     { realms: [{ ...entry, id: "../secrets" }] },
     { realms: [{ ...entry, name: "" }] },
-    { realms: [{ ...entry, articlePacks: 0 }] },
+    { realms: [{ ...entry, data: "./data/psychology/" }] },
+    { realms: [{ ...entry, data: "http://realm-data.example/" }] },
+    { realms: [{ ...entry, data: "https://realm-data.example/data" }] },
+    { realms: [{ ...entry, data: undefined }] },
   ])
     assert.throws(() => validateRealms(data), /unsupported format/u);
 });

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { access, readFile, readdir } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { validateRealms } from "../web/realm.js";
 
 const root = new URL("../", import.meta.url);
 
@@ -37,23 +38,29 @@ test("crawler exclusions cover the entire public site and all data responses", a
   assert.match(policy, /(?:^|; )frame-ancestors 'none'(?:;|$)/u);
 });
 
-test("public staging contains the app and data without private account assets or deployment sources", async (t) => {
-  try {
-    await access(new URL("web/data/philosophy/search/manifest.json", root));
-  } catch (error) {
-    if (error.code === "ENOENT")
-      return t.skip("Build the dataset and full-text index first.");
-    throw error;
-  }
+function prepare(...options) {
   const result = spawnSync(
     "python3",
-    ["scripts/deploy_public.py", "--prepare-only"],
-    {
-      cwd: root,
-      encoding: "utf8",
-    },
+    ["scripts/deploy_public.py", "--prepare-only", ...options],
+    { cwd: root, encoding: "utf8" },
   );
   assert.equal(result.status, 0, result.stderr);
+}
+
+async function built(t) {
+  try {
+    await access(new URL("web/data/philosophy/search/manifest.json", root));
+    return true;
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    t.skip("Build the dataset and full-text index first.");
+    return false;
+  }
+}
+
+test("app staging contains the app and the realm list without realm data, account assets or deployment sources", async (t) => {
+  if (!(await built(t))) return;
+  prepare();
   const staged = new URL(".artifacts/public/", root);
   const names = await readdir(staged, { recursive: true });
   for (const path of [
@@ -70,14 +77,12 @@ test("public staging contains the app and data without private account assets or
     "_headers",
     "realm.js",
     "data/realms.json",
-    "data/philosophy/realm.json",
-    "data/philosophy/links.json",
-    "data/philosophy/graph.json",
-    "data/philosophy/packs/0000.json",
-    "data/philosophy/search/manifest.json",
   ])
     assert.ok(names.includes(path), `Missing public asset: ${path}`);
-  assert.ok(names.every((name) => !/\/(?:articles|build-report)/u.test(name)));
+  assert.deepEqual(
+    names.filter((name) => name.startsWith("data/")),
+    ["data/realms.json"],
+  );
   assert.ok(
     names.every(
       (name) =>
@@ -89,4 +94,58 @@ test("public staging contains the app and data without private account assets or
   assert.doesNotMatch(html, /(?:login|account)\.(?:js|css)/u);
   const app = await readFile(new URL("app.js", staged), "utf8");
   assert.doesNotMatch(app, /initAccount|\/api\/session|\/auth\/google/u);
+  // The released app reads each realm from its own address and may connect
+  // only to those addresses.
+  const realms = validateRealms(
+    JSON.parse(await readFile(new URL("data/realms.json", staged), "utf8")),
+  );
+  const rules = await readFile(new URL("_headers", staged), "utf8");
+  for (const realm of realms) {
+    const address = new URL(realm.data);
+    assert.equal(address.protocol, "https:");
+    assert.ok(address.hostname.endsWith(`-${realm.id}.pages.dev`));
+    assert.match(
+      rules,
+      new RegExp(`connect-src 'self'[^;]* ${address.origin}[ ;]`, "u"),
+    );
+  }
+});
+
+test("realm staging contains one realm's data with one file per article and no local reports", async (t) => {
+  if (!(await built(t))) return;
+  prepare("--realm", "philosophy");
+  const staged = new URL(".artifacts/realms/philosophy/", root);
+  const names = await readdir(staged, { recursive: true });
+  for (const path of [
+    "realm.json",
+    "links.json",
+    "graph.json",
+    "articles/nietzsche.json",
+    "search/manifest.json",
+    "robots.txt",
+    "_headers",
+  ])
+    assert.ok(names.includes(path), `Missing realm asset: ${path}`);
+  assert.ok(names.length < 20000);
+  assert.ok(
+    names.every(
+      (name) =>
+        !/(?:^|\/)(?:\.|build-report|keyword-report|word-freq)/u.test(name),
+    ),
+  );
+  const graph = JSON.parse(
+    await readFile(new URL("graph.json", staged), "utf8"),
+  );
+  assert.equal(
+    names.filter((name) => /^articles\/.+\.json$/u.test(name)).length,
+    graph.nodes.filter((node) => node.article).length,
+  );
+  // Another origin reads these files, and crawlers are asked to stay out.
+  const rules = await readFile(new URL("_headers", staged), "utf8");
+  assert.match(rules, /^\/\*\n {2}Access-Control-Allow-Origin: \*$/mu);
+  assert.match(
+    rules,
+    /^ {2}X-Robots-Tag: noindex, nofollow, noarchive, nosnippet$/mu,
+  );
+  assert.match(rules, /^ {2}X-Content-Type-Options: nosniff$/mu);
 });

@@ -9,29 +9,24 @@ from pathlib import Path
 
 
 from text_processing import clean_text, key, regex_trie
-from wikipedia_select import REFERENCE_SECTIONS, SNAPSHOT, LinkResolver, link_title, read_articles
+from wikipedia_scope import SNAPSHOT, load_scope, work_directory
+from wikipedia_select import REFERENCE_SECTIONS, LinkResolver, link_title, read_articles
 
 ROOT = Path(__file__).resolve().parents[1]
 # Lists of an author's works stay readable in the article but are not searched for mentions.
 WORK_SECTIONS = {"further reading", "bibliography", "publications", "selected publications", "selected works", "selected bibliography", "books", "works", "works cited"}
 OMITTED_SECTIONS = REFERENCE_SECTIONS - WORK_SECTIONS
-PERSON_INFOBOXES = {"infobox scientist", "infobox person", "infobox academic", "infobox philosopher", "infobox writer", "infobox medical person", "infobox officeholder", "infobox artist", "infobox military person", "infobox criminal", "infobox religious biography", "infobox christian leader", "infobox royalty", "infobox economist", "infobox sportsperson"}
-LIFESPAN = re.compile(r"\((?:born |died )?c?\.? ?\d{3,4}(?:\s*[–-]\s*\d{0,4})?\)\s*$")
-OCCUPATION = re.compile(r"\b(?:psychologist|psychiatrist|psychoanalyst|psychotherapist|neuroscientist|philosopher|physician|neurologist|sociologist|professor|academic|researcher|scientist|author|writer|educator|therapist|economist|anthropologist|physiologist|linguist|statistician|biologist|theologian|criminologist|sexologist)\b")
+PERSON_INFOBOXES = {"infobox scientist", "infobox person", "infobox academic", "infobox philosopher", "infobox writer", "infobox medical person", "infobox officeholder", "infobox artist", "infobox military person", "infobox criminal", "infobox religious biography", "infobox christian leader", "infobox royalty", "infobox economist", "infobox sportsperson", "infobox saint", "infobox theologian", "infobox clergy", "infobox jewish leader", "infobox rabbi", "infobox muslim leader", "infobox hindu leader", "infobox buddhist biography", "infobox monarch", "infobox noble", "infobox historian", "infobox politician"}
+# Gods and fictional characters are given biographies as well.
+FIGURE_INFOBOXES = ("infobox deity", "infobox character", "infobox mythical creature")
+LIFESPAN = re.compile(r"\((?:(born|died) )?c?\.? ?(\d{3,4})(?:\s*[–-]\s*(\d{2,4}))?\)\s*$")
+# Wars, plans and programmes have date ranges too, but shorter than a working life.
+LIFESPAN_YEARS = range(15, 111)
+# An occupation counts when it is the noun of the description, not when it describes one: "activist measures".
+OCCUPATION = re.compile(r"\b(?:psychologist|psychiatrist|psychoanalyst|psychotherapist|neuroscientist|philosopher|physician|neurologist|sociologist|professor|researcher|scientist|author|writer|educator|therapist|economist|anthropologist|physiologist|linguist|statistician|biologist|theologian|criminologist|sexologist|historian|folklorist|mythographer|classicist|ethnologist|ethnographer|archaeologist|banker|businessman|businesswoman|entrepreneur|investor|politician|journalist|activist|poet|priest|bishop|archbishop|cardinal|pope|rabbi|imam|monk|nun|missionary|mystic|preacher|pastor|scholar|academic)\b(?=\s*(?:$|[,;(/]|(?:and|who|of|at|in|from|for|known)\b))")
 NOT_A_PERSON = re.compile(r"^(?:book|film|novel|journal|organi[sz]ation|term|list|type|concept|award|theory|study|field|branch|practice|profession|occupation|professional|person who)\b| by ")
-SUBJECT_SEEDS = {"mental disorder": "Clinical & disorders", "psychotherapy": "Therapy & treatment", "cognitive bias": "Cognition & perception", "emotion": "Emotion & motivation", "personality trait": "Social & personality", "defence mechanism": "Schools & history"}
-SUBJECT_TERMS = {
-    "Clinical & disorders": r"disorder\w*|syndrome\w*|psychiatr\w*|psychopatholog\w*|schizo\w*|depress\w*|anxiety|phobia\w*|mania|bipolar|autis\w*|dementia|psychosis|psychotic|addict\w*|trauma\w*|suicid\w*|symptom\w*|diagnos\w*|mental illness|mental health|abuse|paraphilia\w*|delusion\w*|hallucinat\w*",
-    "Therapy & treatment": r"therap\w*|psychotherap\w*|counsel\w*|treatment\w*|intervention\w*|antidepressant\w*|antipsychotic\w*|medication\w*|rehabilitation|mindfulness|meditation|hypno\w*",
-    "Cognition & perception": r"cognit\w*|memory|attention|percept\w*|illusion\w*|bias\w*|heuristic\w*|reasoning|decision\w*|judg\w*|language|psycholinguist\w*|thinking|thought|intelligence|problem solving|conscious\w*|recall|recognition",
-    "Emotion & motivation": r"emotion\w*|affect|feeling\w*|mood|motivat\w*|desire|happiness|fear|anger|love|grief|pleasure|pain|stress|well-being|empathy|shame|guilt|jealousy",
-    "Social & personality": r"social|personality|trait\w*|attitude\w*|prejudice|stereotyp\w*|group\w*|conformity|persuasion|identity|self|interpersonal|relationship\w*|attraction|aggression|altruism|cultur\w*|gender|sexual\w*|leadership|organizational|industrial",
-    "Development & learning": r"development\w*|child\w*|infant\w*|adolescen\w*|aging|learning|educat\w*|school\w*|parent\w*|attachment|conditioning|reinforcement|teaching|student\w*",
-    "Brain & biology": r"neuro\w*|brain|cortex|neuron\w*|genetic\w*|evolution\w*|biolog\w*|physiolog\w*|hormone\w*|sleep|dopamine|serotonin|amygdala|hippocamp\w*|sensory|vision|visual|auditory|psychophysi\w*",
-    "Methods & assessment": r"test\w*|scale\w*|questionnaire\w*|inventory|assessment\w*|measure\w*|psychometric\w*|statistic\w*|experiment\w*|method\w*|validity|reliability|survey\w*|journal|replication",
-    "Schools & history": r"psychoanaly\w*|freud\w*|jung\w*|behaviou?ris\w*|gestalt|humanistic|existential\w*|phenomenolog\w*|history|philosoph\w*|association|society|institute",
-}
-SUBJECT_PATTERNS = {name: re.compile(r"\b(?:" + terms + r")\b", re.I) for name, terms in SUBJECT_TERMS.items()}
+# Journals, societies and events have founding dates and academic descriptions too.
+NOT_PERSON_NOUNS = re.compile(r"\b(?:journal|magazine|newspaper|periodical|degree|society|association|organi[sz]ation|institute|movement|discipline|recession|downturn|crisis|conference|treaty|dynasty|commune|forum|program|programme|plan|period|series|center|centre|agenda|company|division|bloc|agreement|group|body)\b")
 OTHER_SUBJECT = "Other / interdisciplinary"
 
 
@@ -130,22 +125,49 @@ def convert(article):
     return {"preamble": preamble, "main_text": main_text, "bibliography": bibliography, "related": related, "links": body_links}
 
 
+def has_lifespan(description):
+    """Whether a description ends with a birth year, a death year or the years of a life."""
+    match = LIFESPAN.search(description)
+    if not match:
+        return False
+    if match[1]:
+        return True
+    if not match[3]:
+        return False
+    start, end = match[2], match[3]
+    # "(1945–53)" abbreviates the second year.
+    end = start[: len(start) - len(end)] + end if len(end) < len(start) else end
+    return int(end) - int(start) in LIFESPAN_YEARS
+
+
 def is_person(article, occupation_listed):
     description = (article.get("description") or "").strip()
     if occupation_listed:
         return True
     if NOT_A_PERSON.search(description.lower()):
         return False
-    if any(isinstance(name, str) and name.lower() in PERSON_INFOBOXES for name in article.get("infoboxes") or []):
+    infoboxes = [name.lower() for name in article.get("infoboxes") or [] if isinstance(name, str)]
+    if any(name.startswith(FIGURE_INFOBOXES) for name in infoboxes):
+        return False
+    if any(name in PERSON_INFOBOXES for name in infoboxes):
         return True
-    return bool(LIFESPAN.search(description)) or (len(description.split()) <= 7 and bool(OCCUPATION.search(description.lower())))
+    if NOT_PERSON_NOUNS.search(description.lower()):
+        return False
+    return has_lifespan(description) or (len(description.split()) <= 7 and bool(OCCUPATION.search(description.lower())))
 
 
-def subject(article, seeds, introduction):
-    scores = {name: 6 * len(pattern.findall(article["name"])) + 3 * len(pattern.findall(article.get("description") or "")) + len(pattern.findall(introduction[:1600])) for name, pattern in SUBJECT_PATTERNS.items()}
+def subject_patterns(scope):
+    """Compile each subject's terms and list the subject each Wikidata seed points to."""
+    patterns = {name: re.compile(r"\b(?:" + entry["terms"] + r")\b", re.I) for name, entry in scope["subjects"].items()}
+    seeds = {seed: name for name, entry in scope["subjects"].items() for seed in entry["seeds"]}
+    return patterns, seeds
+
+
+def subject(article, seeds, introduction, patterns, seed_subjects):
+    scores = {name: 6 * len(pattern.findall(article["name"])) + 3 * len(pattern.findall(article.get("description") or "")) + len(pattern.findall(introduction[:1600])) for name, pattern in patterns.items()}
     for seed in seeds:
-        if seed in SUBJECT_SEEDS:
-            scores[SUBJECT_SEEDS[seed]] += 4
+        if seed in seed_subjects:
+            scores[seed_subjects[seed]] += 4
     best = max(scores, key=scores.get)
     return best if scores[best] >= 2 else OTHER_SUBJECT
 
@@ -252,11 +274,14 @@ def write_rows(rows, output):
     pq.write_table(pa.Table.from_pylist(rows, schema=schema), output)
 
 
-def build(snapshot, output, title_share, alias_share, alias_lift, surname_share):
-    selected = json.loads((snapshot / "selected.json").read_text())
+def build(realm, snapshot=SNAPSHOT, title_share=0.05, alias_share=0.1, alias_lift=3.0, surname_share=0.5):
+    work = work_directory(realm, snapshot)
+    output = ROOT / "data" / realm / "articles.parquet"
+    patterns, seed_subjects = subject_patterns(load_scope(realm))
+    selected = json.loads((work / "selected.json").read_text())
     articles = {}
     for name in ("candidates.jsonl", "neighbours.jsonl"):
-        for article in read_articles(snapshot / name):
+        for article in read_articles(work / name):
             if article["name"] in selected:
                 articles[article["name"]] = article
     articles = [articles[name] for name in sorted(articles)]
@@ -289,7 +314,7 @@ def build(snapshot, output, title_share, alias_share, alias_lift, surname_share)
         rows.append({
             "shorturl": ids[article["name"]], "title": article["name"], "url": article["url"],
             "pubinfo": f"English Wikipedia revision {article['revision']}" + (f", last modified {modified}." if modified else "."),
-            "person": person, "subject": subject(article, meta["seeds"], " ".join(parts["preamble"])),
+            "person": person, "subject": subject(article, meta["seeds"], " ".join(parts["preamble"]), patterns, seed_subjects),
             "preamble": parts["preamble"], "main_text": parts["main_text"], "bibliography": parts["bibliography"], "related_entries": related,
             "toc": [{"content_title": section["section_title"], "sub_toc": [sub["subsection_title"] for sub in section["subsections"]]} for section in parts["main_text"]],
         })
@@ -307,11 +332,11 @@ def build(snapshot, output, title_share, alias_share, alias_lift, surname_share)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--realm", required=True)
     parser.add_argument("--snapshot", type=Path, default=SNAPSHOT)
-    parser.add_argument("--output", type=Path, default=ROOT / "data/psychology/articles.parquet")
     parser.add_argument("--title-share", type=float, default=0.05, help="share of the articles using a common title that must link to it")
     parser.add_argument("--alias-share", type=float, default=0.1, help="the same share for another phrase to become an alias")
     parser.add_argument("--alias-lift", type=float, default=3.0, help="how far an alias must exceed the article's ordinary link rate")
     parser.add_argument("--surname-share", type=float, default=0.5, help="the share for a person's surname")
     args = parser.parse_args()
-    build(args.snapshot.resolve(), args.output.resolve(), args.title_share, args.alias_share, args.alias_lift, args.surname_share)
+    build(args.realm, args.snapshot.resolve(), args.title_share, args.alias_share, args.alias_lift, args.surname_share)

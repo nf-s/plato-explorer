@@ -43,6 +43,16 @@ def shared_nodes(first, second):
     return {node_id: other for node_id, other in sorted(pairs.items()) if kinds[0][node_id] == kinds[1][other]}
 
 
+def same_articles(first, second):
+    """Return {first ID: second ID} for nodes that are the same article of a source both realms draw on."""
+    addresses = {node["url"]: node["id"] for node in second["nodes"] if node.get("url")}
+    return {node["id"]: addresses[node["url"]] for node in sorted(first["nodes"], key=lambda node: node["id"]) if node.get("url") in addresses}
+
+
+def source_hosts(realm):
+    return set(json.loads(realm.config.read_text())["source"]["hosts"])
+
+
 def excluded_pairs(first_name, second_name):
     entries = json.loads(EXCLUSIONS.read_text())
     if not isinstance(entries, list) or not all(isinstance(entry, dict) and len(entry) == 2 and all(isinstance(value, str) for value in entry.values()) for entry in entries):
@@ -56,7 +66,9 @@ def build():
     links = {realm.name: {} for realm in realms}
     for first, second in combinations(realms, 2):
         omitted = excluded_pairs(first.name, second.name)
-        forward = {node_id: other for node_id, other in shared_nodes(graphs[first.name], graphs[second.name]).items() if (node_id, other) not in omitted}
+        # Names can mislead, so two realms from one source are joined by article instead.
+        match = same_articles if source_hosts(first) & source_hosts(second) else shared_nodes
+        forward = {node_id: other for node_id, other in match(graphs[first.name], graphs[second.name]).items() if (node_id, other) not in omitted}
         links[first.name][second.name] = forward
         links[second.name][first.name] = dict(sorted((other, node_id) for node_id, other in forward.items()))
         print(f"Linked {len(forward):,} shared nodes between {first.name} and {second.name}.", flush=True)

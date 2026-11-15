@@ -32,9 +32,10 @@ Open `http://127.0.0.1:5173` in your browser.
 
 ## Realms
 
-The explorer shows one realm at a time. Philosophy is the SEP. Psychology is about 8,000 English Wikipedia articles, and its build needs a 35 GB Wikipedia snapshot. A node found in both realms links to the other. [Realms](docs/realms.md) · [Psychology sources and build steps](docs/psychology.md)
+The explorer shows one realm at a time. Philosophy is the SEP. Psychology, Economics, Society, Religion and Mythology each hold 7,000 to 10,000 English Wikipedia articles, and their builds need a 35 GB Wikipedia snapshot. A node found in several realms links to the others. [Realms](docs/realms.md) · [Wikipedia sources and build steps](docs/wikipedia-realms.md)
 
 ```sh
+python scripts/build_wikipedia_realm.py --realm psychology
 python scripts/build_data.py --realm psychology
 python scripts/build_search.py --realm psychology
 python scripts/build_realm_links.py

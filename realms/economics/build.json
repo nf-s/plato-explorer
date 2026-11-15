@@ -1,0 +1,5 @@
+{
+  "source": "data/economics/articles.parquet",
+  "curation": "realms/economics",
+  "people": null
+}

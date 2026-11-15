@@ -838,6 +838,22 @@ button:hover {
 .action-pair button {
   flex: 1;
 }
+.realm-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.realm-links-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.realm-links a {
+  width: auto;
+  padding: 7px 11px;
+}
 .text-button {
   font-size: 11px;
   color: var(--accent);

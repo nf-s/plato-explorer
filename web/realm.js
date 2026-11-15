@@ -1,5 +1,6 @@
-// A realm is one corpus with its own graph, articles and search index under
-// data/<realm>/. The copy that names its source comes from its realm.json.
+// A realm is one corpus with its own graph, articles and search index. The
+// realm list says where each realm's data is. The copy that names its source
+// comes from its realm.json.
 function record(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -19,6 +20,15 @@ function httpsUrl(value) {
 
 const REALM_ID = /^[a-z][a-z0-9-]*$/;
 
+// A realm's data sits beside the app in a local build. A release serves each
+// realm from an address of its own.
+function dataAddress(value, id) {
+  return (
+    value === `./data/${id}/` ||
+    (httpsUrl(value) && new URL(value).href === value && value.endsWith("/"))
+  );
+}
+
 // The realm menu lists every built realm; the first is the default.
 export function validateRealms(data) {
   if (
@@ -33,22 +43,18 @@ export function validateRealms(data) {
         ["name", "source", "sourceShortName"].every((field) =>
           text(entry[field]),
         ) &&
-        Number.isSafeInteger(entry.articlePacks) &&
-        entry.articlePacks >= 1 &&
-        entry.articlePacks <= 10000,
+        dataAddress(entry.data, entry.id),
     ) ||
     new Set(data.realms.map((entry) => entry.id)).size !== data.realms.length
   )
     throw new Error("The realm list has an unsupported format.");
-  return data.realms.map(
-    ({ id, name, source, sourceShortName, articlePacks }) => ({
-      id,
-      name,
-      source,
-      sourceShortName,
-      articlePacks,
-    }),
-  );
+  return data.realms.map(({ id, name, source, sourceShortName, data }) => ({
+    id,
+    name,
+    source,
+    sourceShortName,
+    data,
+  }));
 }
 
 // Addresses without a known realm, including those shared before realms
@@ -65,7 +71,7 @@ export function realmHref(realms, id, nodeId = null) {
 }
 
 export function dataPath(realm) {
-  return `./data/${realm.id}/`;
+  return realm.data;
 }
 
 export function validateRealm(data, id) {

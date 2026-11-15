@@ -14,6 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 USER_AGENT = "explorer-corpus-builder/0.1 (local research script)"
 WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
 WIKIDATA_SPARQL = "https://query.wikidata.org/sparql"
+SNAPSHOT = ROOT / "data/wikipedia"
+IMPORTANCE = ["Top", "High", "Mid", "Low"]
+SELECTION = ("expandLinks", "incoming", "seedLinks", "neighbourLinks", "share")
 
 
 def get_json(url, parameters, attempts=6):
@@ -62,16 +65,47 @@ def cached(directory, name, fetch):
     return values, False
 
 
-def build(config, output):
-    scope = json.loads(config.read_text())
-    cache = output.parent / "scope-cache"
+def load_scope(realm):
+    """Read realms/<realm>/scope.json: where candidates come from, how they are selected and how subjects are estimated."""
+    scope = json.loads((ROOT / "realms" / realm / "scope.json").read_text())
+    if not isinstance(scope, dict) or set(scope) != {"wikiProjects", "importance", "wikidataSeeds", "selection", "subjects"}:
+        raise ValueError(f"Invalid scope for {realm}")
+    if not scope["wikiProjects"] or not all(isinstance(category, str) and "{importance}" in category for category in scope["wikiProjects"]):
+        raise ValueError(f"Invalid WikiProject categories for {realm}")
+    if not scope["importance"] or not set(scope["importance"]) <= set(IMPORTANCE):
+        raise ValueError(f"Invalid importance levels for {realm}")
+    for seed in scope["wikidataSeeds"]:
+        if not isinstance(seed, dict) or set(seed) != {"name", "pattern", "person"} or not isinstance(seed["person"], bool):
+            raise ValueError(f"Invalid Wikidata seed for {realm}")
+    if set(scope["selection"]) != set(SELECTION) or not all(isinstance(value, (int, float)) for value in scope["selection"].values()):
+        raise ValueError(f"Invalid selection thresholds for {realm}")
+    seeds = {seed["name"] for seed in scope["wikidataSeeds"]}
+    for entry in scope["subjects"].values():
+        if not isinstance(entry, dict) or set(entry) != {"terms", "seeds"} or not isinstance(entry["terms"], str) or not set(entry["seeds"]) <= seeds:
+            raise ValueError(f"Invalid subject for {realm}")
+    return scope
+
+
+def work_directory(realm, snapshot=SNAPSHOT):
+    """Each realm keeps its candidate lists and copied articles in its own folder beside the snapshot."""
+    return snapshot / realm
+
+
+def build(realm, snapshot=SNAPSHOT):
+    scope = load_scope(realm)
+    work = work_directory(realm, snapshot)
+    cache = work / "scope-cache"
     titles = {}
-    for importance in scope["wikiProject"]["importance"]:
-        category = scope["wikiProject"]["category"].format(importance=importance)
-        found, _ = cached(cache, category, lambda: list(category_titles(category)))
-        for title in found:
-            titles.setdefault(title, {"importance": importance, "seeds": [], "person": False})
-        print(f"{importance}-importance: {len(found):,} articles", flush=True)
+    for template in scope["wikiProjects"]:
+        for importance in scope["importance"]:
+            category = template.format(importance=importance)
+            found, _ = cached(cache, category, lambda: list(category_titles(category)))
+            for title in found:
+                entry = titles.setdefault(title, {"importance": importance, "seeds": [], "person": False})
+                # An article rated by several projects keeps its highest rating.
+                if IMPORTANCE.index(importance) < IMPORTANCE.index(entry["importance"]):
+                    entry["importance"] = importance
+            print(f"{category}: {len(found):,} articles", flush=True)
     for seed in scope["wikidataSeeds"]:
         found, reused = cached(cache, "wikidata " + seed["name"], lambda: seed_titles(seed["pattern"]))
         for title in found:
@@ -83,14 +117,13 @@ def build(config, output):
         if not reused:
             # The public query service has been limiting clients to one request per minute.
             time.sleep(65)
-    output.parent.mkdir(parents=True, exist_ok=True)
+    work.mkdir(parents=True, exist_ok=True)
+    output = work / "candidates.json"
     output.write_text(json.dumps(titles, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
     print(f"Wrote {len(titles):,} candidate titles to {output}", flush=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=ROOT / "realms/psychology/scope.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "data/wikipedia/candidates.json")
-    args = parser.parse_args()
-    build(args.config.resolve(), args.output.resolve())
+    parser.add_argument("--realm", required=True)
+    build(parser.parse_args().realm)

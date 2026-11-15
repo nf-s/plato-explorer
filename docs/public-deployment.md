@@ -1,16 +1,25 @@
 # Public Cloudflare Pages deployment
 
-Cloudflare Pages serves the frontend, graph, article JSON, and search index without sign-in. The Pages project is `plato-network` and its production branch is `main`.
+Cloudflare Pages serves the frontend, graph, article JSON, and search index without sign-in. The app's Pages project is `plato-network` and its production branch is `main`. Each realm's data is served from a second project named after it, such as `plato-network-psychology`.
 
-This is a Direct Upload project with no connected Git source. Pushing source to GitHub does not deploy the app. Releases upload the verified local files with Wrangler. Wrangler reports the deployment URL after each release.
+These are Direct Upload projects with no connected Git source. Pushing source to GitHub does not deploy the app. Releases upload the verified local files with Wrangler. Wrangler reports the deployment URL after each release.
 
-The public project has no Pages Functions, D1 bindings, environment variables, or authentication API. The previous private Worker and its access database have their own resources. [Legacy deployment reference](deployment.md)
+The public projects have no Pages Functions, D1 bindings, environment variables, or authentication API. The previous private Worker and its access database have their own resources. [Legacy deployment reference](deployment.md)
 
 ## Realms
 
-One release carries the app and every built realm. The script stages `.artifacts/public/` with the frontend allowlist, `data/realms.json` and each realm's `realm.json`, `links.json`, `graph.json`, `packs/` and `search/`. Per-article files and local build reports are left out. The Pages project comes from `realms/app.json`. Run `scripts/build_realm_links.py` before staging. [Realms](realms.md)
+The app and each realm's data are released separately. [Where a release keeps the data](realms.md#where-a-release-keeps-the-data)
 
-Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per deployment and 25 MiB per file. Articles are packed into shared files, so two realms stage about 1,570 files. [Article packs](realms.md#article-packs)
+| Release | Staged in | Contents | Pages project |
+| ------- | --------- | -------- | ------------- |
+| The app | `.artifacts/public/` | The frontend allowlist and `data/realms.json` | The project in `realms/app.json` |
+| One realm's data | `.artifacts/realms/<id>/` | `realm.json`, `links.json`, `graph.json`, `articles/`, `search/`, `robots.txt` and `realms/_headers` | `<app project>-<id>` |
+
+The staged `realms.json` gives each realm the address `https://<app project>-<id>.pages.dev/`, and the staged `_headers` adds those addresses to the app's `connect-src` rule. `realms/_headers` lets any origin read the realm files and repeats the crawler and `nosniff` headers. Local build reports are left out.
+
+Release a realm's data before the app lists it. The app release fetches `realm.json` from every listed address and stops if one is missing. Run `scripts/build_realm_links.py` before staging, then release every realm whose `links.json` changed.
+
+Static asset requests are free and unlimited on Pages. The Free plan accepts 20,000 files per project and 25 MiB per file. The script refuses to stage more.
 
 The psychology realm was first released to a separate Pages project, `psyche-network`. Retire or redirect it once the combined app is released.
 
@@ -28,19 +37,23 @@ For local review without network changes:
 
 ```sh
 python3 scripts/deploy_public.py --prepare-only
+python3 scripts/deploy_public.py --realm psychology --prepare-only
 ```
 
-This stages `.artifacts/public/`, an ignored directory containing the explicit frontend allowlist in `scripts/deploy_public.py` plus generated JSON data. New frontend dependencies must be added to that allowlist. It includes `navigation.js`, `manifest.webmanifest`, the `icons/` SVG/PNG assets, `robots.txt`, and `_headers`. Account/login assets, Worker source, Wrangler configuration, and credentials are excluded. `--prepare-only` stages files without running checks or tests.
+The first command stages `.artifacts/public/`, an ignored directory containing the explicit frontend allowlist in `scripts/deploy_public.py` plus the realm list. The second stages one realm's data. New frontend dependencies must be added to that allowlist. It includes `navigation.js`, `manifest.webmanifest`, the `icons/` SVG/PNG assets, `robots.txt`, and `_headers`. Account/login assets, Worker source, Wrangler configuration, and credentials are excluded. `--prepare-only` stages files without running checks or tests.
 
 For an authorized release, authenticate Wrangler for the target Cloudflare account and set `CLOUDFLARE_ACCOUNT_ID` in your environment. The Pages helper requires the account ID from the caller. Run from the repository root with Wrangler on PATH.
 
 ```sh
+python3 scripts/deploy_public.py --realm psychology
 python3 scripts/deploy_public.py
 ```
 
+Add `--create-project` the first time a realm is released. It creates the realm's Pages project before uploading. If Cloudflare assigns that project an address other than `<project>.pages.dev`, the app release reports the realm as missing.
+
 Use `--wrangler /path/to/wrangler/bin/wrangler.js` to specify a Wrangler installation.
 
-The script runs syntax checks and `npm test`, prepares fresh assets, and invokes `wrangler pages deploy` with project `plato-network` and production branch `main`. It runs Wrangler from a clean temporary working directory so it cannot load the private Worker's `wrangler.jsonc` or `.dev.vars`. Pages does not support a custom configuration-file path, so there is no second Wrangler config. Reuse the existing Pages project for subsequent releases.
+The script runs syntax checks and `npm test`, prepares fresh assets, and invokes `wrangler pages deploy` with the target project and production branch `main`. It runs Wrangler from a clean temporary working directory so it cannot load the private Worker's `wrangler.jsonc` or `.dev.vars`. Pages does not support a custom configuration-file path, so there is no second Wrangler config. Reuse the existing Pages projects for subsequent releases.
 
 `scripts/deploy.py` and plain `wrangler deploy` belong to the legacy private Worker workflow. The legacy script rebuilds data, applies D1 migrations and uploads authentication secrets.
 
@@ -56,7 +69,7 @@ The separate legacy Worker reads its own authentication database when users visi
 
 `robots.txt` disallows every path for compliant crawlers. The wildcard rule in `web/_headers` sends `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet` on static responses, including direct article JSON, search indexes, and installation assets. HTML also carries a robots meta tag. These directives request exclusion from crawling and indexing. A crawler can ignore them.
 
-The same header rule provides `nosniff`, `no-referrer`, framing restrictions, a same-origin content policy, and disabled camera/microphone/geolocation permissions. The graph uses inline styles for positioning. Script execution is restricted to same-origin files and Cloudflare Web Analytics. The Pages project injects its own analytics beacon at the edge; keep shared HTML free of manual beacons. The CSP permits only `https://static.cloudflareinsights.com` for its script and `https://cloudflareinsights.com` for collection. Future Functions would need to set their own response headers. [Pages headers](https://developers.cloudflare.com/pages/configuration/headers/)
+The same header rule provides `nosniff`, `no-referrer`, framing restrictions, a content policy limited to the app and the realm addresses, and disabled camera/microphone/geolocation permissions. The graph uses inline styles for positioning. Script execution is restricted to same-origin files and Cloudflare Web Analytics. The Pages project injects its own analytics beacon at the edge; keep shared HTML free of manual beacons. The CSP permits only `https://static.cloudflareinsights.com` for its script and `https://cloudflareinsights.com` for collection. Future Functions would need to set their own response headers. [Pages headers](https://developers.cloudflare.com/pages/configuration/headers/)
 
 Retain article author attribution, original SEP links, and the reader's copyright notice. The **About & copyright** panel identifies the authors' article rights and the Metaphysics Research Lab, Stanford University, links to SEP's copyright information, and states that this project is not affiliated with or endorsed by SEP or Stanford. Attribution and crawler directives do not grant permission to reuse the source content.
 
@@ -74,7 +87,7 @@ Check unauthenticated GET and HEAD requests against both canonical and deploymen
 
 - `/`, `/app.js`, `/navigation.js`, and `/styles.css`
 - `/robots.txt`, `/manifest.webmanifest`, and the Apple touch and manifest icons
-- `/data/realms.json`, then for each realm `/data/<realm>/realm.json`, `/data/<realm>/graph.json`, an encoded graph path, an article pack such as `/data/philosophy/packs/0000.json`, `/data/<realm>/search/manifest.json`, and a search shard.
+- `/data/realms.json` on the app, then on each realm's address `/realm.json`, `/graph.json`, an article such as `/articles/nietzsche.json`, `/search/manifest.json`, and a search shard. Realm responses must carry `Access-Control-Allow-Origin: *`.
 
 Responses must carry the expected crawl and security headers and load without authentication redirects or session cookies. `/index.html` may redirect to `/` because Pages canonicalizes HTML paths. Compare deployed content with the freshly staged files where practical. Confirm `robots.txt` disallows `/`. Cloudflare's edge has rejected Python's default urllib user agent with error 1010. A browser check distinguished this edge response from a failing app in the original release.
 

@@ -12,7 +12,7 @@ Read the [working instructions](../AGENTS.md), then use the relevant entry below
 | Adding a missing person, alias or keyword, or investigating an unexpected edge       | [Data model](data-model.md) and [link audit](link-audit.md)     |
 | Finding words in article text or investigating request costs                         | [Full-text search](search.md)                                   |
 | Taps, scrolling, history, passage highlights, mobile Contents or the Home Screen app | [Mobile navigation and acceptance checks](mobile-navigation.md) |
-| Realms, their settings and storage, or links between realms                          | [Realms](realms.md) and [Psychology realm](psychology.md)       |
+| Realms, their settings and storage, or links between realms                          | [Realms](realms.md) and [Wikipedia realms](wikipedia-realms.md) |
 | Releasing the public site or maintaining its NFS home link                           | [Public deployment](public-deployment.md)                       |
 | Maintaining the separate, earlier Google-protected Worker                            | [Private Worker reference](deployment.md)                       |
 
@@ -30,7 +30,9 @@ Read the [working instructions](../AGENTS.md), then use the relevant entry below
 
 ## Release record and verification
 
-On 15 November 2026 the two explorers were merged into one app with a realm menu. The change passed 98 JavaScript and 39 Python tests and browser checks of both realms at desktop, 375px and 320px widths. It was released to `plato-network` the same day and both realms were checked live. Articles were then packed into shared files, which cut the staged release from 10,054 files to 1,567. The separate psychology Pages project still serves its earlier build.
+Later on 15 November 2026 four Wikipedia realms were added: Economics, Society (sociology and anthropology), Religion and Mythology. The user did not want an article's download to include other articles, so the article packs were withdrawn in favour of one file per article, and a release now gives each realm's data its own Pages project. [Where a release keeps the data](realms.md#where-a-release-keeps-the-data) The change passed 100 JavaScript and 41 Python tests and local browser checks of the six realms at desktop and 375px widths. It has not been released: `plato-network` still serves the two-realm build of that morning, and the six data projects do not exist yet. The first release must create them and confirm that the app can read them across origins.
+
+On 15 November 2026 the two explorers were merged into one app with a realm menu. The change passed 98 JavaScript and 39 Python tests and browser checks of both realms at desktop, 375px and 320px widths. It was released to `plato-network` the same day and both realms were checked live. The separate psychology Pages project still serves its earlier build.
 
 On 13 November 2026 the first psychology build held 7,994 articles and 278,274 connections in 8,147 uploaded files, with a 12.6 MB graph. It passed 97 JavaScript and 39 Python tests and browser checks of the graph, mentions, reader, search and a 375px layout. The refactored Plato build produced byte-identical graph and article files.
 

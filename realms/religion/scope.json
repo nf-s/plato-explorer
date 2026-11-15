@@ -1,0 +1,63 @@
+{
+  "wikiProjects": [
+    "{importance}-importance Religion articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
+  "wikidataSeeds": [
+    {
+      "name": "theologian",
+      "pattern": "?item wdt:P106 wd:Q1234713",
+      "person": true
+    }
+  ],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 5,
+    "seedLinks": 3,
+    "neighbourLinks": 25,
+    "share": 0.2
+  },
+  "subjects": {
+    "Christianity": {
+      "terms": "christ\\w*|church\\w*|catholic\\w*|protestant\\w*|orthodox|bibl\\w*|gospel\\w*|pope|papal|saint\\w*|jesus|apostl\\w*|baptis\\w*|evangel\\w*|anglican\\w*|lutheran\\w*|trinity",
+      "seeds": []
+    },
+    "Islam": {
+      "terms": "islam\\w*|muslim\\w*|quran\\w*|qur'an\\w*|muhammad|sunni|shia|shi'a|sufi\\w*|caliph\\w*|sharia|hadith|imam\\w*|mosque\\w*",
+      "seeds": []
+    },
+    "Judaism": {
+      "terms": "jew\\w*|judai\\w*|hebrew|rabbi\\w*|torah|talmud\\w*|israelite\\w*|kabbalah|synagogue\\w*|hasidi\\w*|zion\\w*",
+      "seeds": []
+    },
+    "Indian traditions": {
+      "terms": "hindu\\w*|buddh\\w*|jain\\w*|sikh\\w*|vedic|veda\\w*|vedanta|yoga|dharma|karma|sanskrit|bodhisattva\\w*|nirvana|tantra\\w*|guru\\w*",
+      "seeds": []
+    },
+    "East Asian traditions": {
+      "terms": "tao\\w*|dao\\w*|confucian\\w*|shinto|zen|chinese|japanese|korean|tibetan|shamanism in",
+      "seeds": []
+    },
+    "Ancient, indigenous & new movements": {
+      "terms": "pagan\\w*|indigenous|shaman\\w*|animis\\w*|new religious movement\\w*|cult\\w*|scientology|wicca\\w*|ancient|zoroastr\\w*|gnostic\\w*|manichae\\w*|druid\\w*|occult\\w*|spiritualis\\w*|bah\\S+|folk religion",
+      "seeds": []
+    },
+    "Theology & doctrine": {
+      "terms": "theolog\\w*|doctrin\\w*|god|deit\\w*|soul|sin|salvation|afterlife|heaven|hell|prophe\\w*|revelation|creed\\w*|eschatolog\\w*|monotheis\\w*|polytheis\\w*|panthe\\w*|heres\\w*|divin\\w*|angel\\w*|demon\\w*",
+      "seeds": []
+    },
+    "Practice & institutions": {
+      "terms": "ritual\\w*|prayer\\w*|worship|pilgrim\\w*|monas\\w*|clergy|priest\\w*|temple\\w*|festival\\w*|liturg\\w*|sacrament\\w*|fasting|meditation|sacrifice\\w*|scripture\\w*|sacred|relic\\w*|ordination",
+      "seeds": []
+    },
+    "Religion & society": {
+      "terms": "secular\\w*|atheis\\w*|agnostic\\w*|freedom of religion|persecution|politic\\w*|law|science|sociology of religion|religious studies|study of religion|interfaith|fundamentalis\\w*|toleran\\w*|irreligion|humanis\\w*",
+      "seeds": []
+    }
+  }
+}

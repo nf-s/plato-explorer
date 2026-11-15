@@ -1,11 +1,13 @@
+import json
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from build_realm_links import shared_nodes
-from wikipedia_rows import article_ids, convert, is_person, matching_terms, subject
+from build_realm_links import same_articles, shared_nodes
+from wikipedia_rows import article_ids, convert, is_person, matching_terms, subject, subject_patterns
+from wikipedia_scope import load_scope
 from wikipedia_select import link_title, outgoing_titles
 
 
@@ -73,11 +75,26 @@ class ConversionTests(unittest.TestCase):
         self.assertTrue(is_person({"description": "", "infoboxes": ["Infobox scientist"]}, False))
         self.assertFalse(is_person({"description": "Book by American psychologist B. F. Skinner", "infoboxes": []}, False))
         self.assertFalse(is_person({"description": "Mental disorder", "infoboxes": ["Infobox medical condition"]}, False))
+        self.assertTrue(is_person({"description": "British academic", "infoboxes": []}, False))
+        self.assertTrue(is_person({"description": "American academic and author", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Academic journal", "infoboxes": ["Infobox journal"]}, False))
+        self.assertFalse(is_person({"description": "Postgraduate academic degree", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "German socialist journal (1883–1923)", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Global economic downturn (1918–1921)", "infoboxes": []}, False))
+        self.assertTrue(is_person({"description": "President of a learned society", "infoboxes": ["Infobox officeholder"]}, False))
+        self.assertTrue(is_person({"description": "Chinese general and folk hero (died 220)", "infoboxes": []}, False))
+        self.assertTrue(is_person({"description": "Philosopher (born 1969)", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Massacre in Western Australia (1834)", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Popular revolt in Upstate New York (1839–1845)", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Domestic agenda of a U.S. president (1945–53)", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Investor pressure that enforces financial prudence", "infoboxes": []}, False))
+        self.assertFalse(is_person({"description": "Fish avatar of Vishnu", "infoboxes": ["Infobox deity<!--Hindu mythology-->", "Infobox royalty"]}, False))
 
     def test_subject_uses_title_description_introduction_and_seed_classes(self):
-        self.assertEqual(subject({"name": "Working memory", "description": "Cognitive system"}, [], "Holds information for reasoning."), "Cognition & perception")
-        self.assertEqual(subject({"name": "Koro", "description": ""}, ["mental disorder"], ""), "Clinical & disorders")
-        self.assertEqual(subject({"name": "Zeitgeist", "description": ""}, [], ""), "Other / interdisciplinary")
+        patterns, seeds = subject_patterns(load_scope("psychology"))
+        self.assertEqual(subject({"name": "Working memory", "description": "Cognitive system"}, [], "Holds information for reasoning.", patterns, seeds), "Cognition & perception")
+        self.assertEqual(subject({"name": "Koro", "description": ""}, ["mental disorder"], "", patterns, seeds), "Clinical & disorders")
+        self.assertEqual(subject({"name": "Zeitgeist", "description": ""}, [], "", patterns, seeds), "Other / interdisciplinary")
 
 
 class MatchingTermTests(unittest.TestCase):
@@ -111,6 +128,17 @@ class MatchingTermTests(unittest.TestCase):
         self.assertEqual(entry["uses"], 33)
 
 
+class ScopeTests(unittest.TestCase):
+    def test_every_wikipedia_realm_estimates_the_subjects_its_interface_lists(self):
+        realms = Path(__file__).resolve().parents[1] / "realms"
+        names = [path.parent.name for path in sorted(realms.glob("*/scope.json"))]
+        self.assertIn("mythology", names)
+        for name in names:
+            patterns, _ = subject_patterns(load_scope(name))
+            listed = [entry[0] for entry in json.loads((realms / name / "realm.json").read_text())["subjects"]]
+            self.assertEqual([*patterns, "Other / interdisciplinary"], listed)
+
+
 class PartnerLinkTests(unittest.TestCase):
     def test_titles_and_aliases_match_but_people_never_match_concepts(self):
         def node(node_id, title, aliases=(), person=False):
@@ -119,6 +147,15 @@ class PartnerLinkTests(unittest.TestCase):
         philosophy = {"nodes": [node("love", "Love"), node("freud", "Sigmund Freud", ["Freud"], True), node("keyword-music", "Music"), node("mill", "John Stuart Mill", ["Mill"], True), node("memory", "Memory")]}
         psychology = {"nodes": [node("love", "Love"), node("sigmund-freud", "Sigmund Freud", [], True), node("music-psychology", "Psychology of music", ["Music"]), node("mill", "Mill (grinding)"), node("memory", "Memory"), node("memory-2", "Memory (journal)")]}
         self.assertEqual(shared_nodes(philosophy, psychology), {"freud": "sigmund-freud", "keyword-music": "music-psychology", "love": "love"})
+
+    def test_realms_from_one_source_share_only_the_same_article(self):
+        def node(node_id, title, address=None):
+            return {"id": node_id, "title": title, "aliases": [], "person": False, "url": address}
+
+        wiki = "https://en.wikipedia.org/wiki/"
+        economics = {"nodes": [node("demand", "Demand", wiki + "Demand"), node("stimulus-economics", "Stimulus (economics)", wiki + "Stimulus_(economics)"), node("keyword-thrift", "Thrift")]}
+        psychology = {"nodes": [node("demand-psychoanalysis", "Demand (psychoanalysis)", wiki + "Demand_(psychoanalysis)"), node("stimulus-economics", "Stimulus (economics)", wiki + "Stimulus_(economics)"), node("keyword-thrift", "Thrift")]}
+        self.assertEqual(same_articles(economics, psychology), {"stimulus-economics": "stimulus-economics"})
 
 
 if __name__ == "__main__":

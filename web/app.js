@@ -396,15 +396,16 @@ function renderSelection() {
       ),
     );
   }
-  for (const other of linkedRealms(linked, realms, node.id)) {
-    const link = element(
-      "a",
-      "secondary-button",
-      `Open in ${other.realm.name}`,
-    );
-    link.href = other.href;
-    const actions = element("div", "action-pair");
-    actions.append(link);
+  const others = linkedRealms(linked, realms, node.id);
+  if (others.length) {
+    const actions = element("div", "realm-links");
+    actions.append(element("span", "realm-links-label", "Open in"));
+    for (const other of others) {
+      const link = element("a", "secondary-button", other.realm.name);
+      link.href = other.href;
+      link.setAttribute("aria-label", `Open in ${other.realm.name}`);
+      actions.append(link);
+    }
     fragment.append(actions);
   }
   fragment.append(
@@ -1083,7 +1084,6 @@ async function start() {
       },
       realm.source,
       data,
-      chosen.articlePacks,
     );
     evidence = new ConnectionEvidence(reader);
     fullText = new FullTextSearch(sourceGraph, reader, data);

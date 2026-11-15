@@ -10,9 +10,9 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote
 
+from wikipedia_scope import SNAPSHOT, load_scope, work_directory
 
-ROOT = Path(__file__).resolve().parents[1]
-SNAPSHOT = ROOT / "data/wikipedia"
+
 ARTICLE_PREFIX = "https://en.wikipedia.org/wiki/"
 TITLE_INDEX = "enwiki-latest-pages-articles-multistream-index.txt.bz2"
 REDIRECT_TABLE = "enwiki-latest-redirect.sql.gz"
@@ -76,7 +76,7 @@ def resolve_redirects(titles, snapshot):
         return cache
     for name in (TITLE_INDEX, REDIRECT_TABLE):
         if not (snapshot / name).exists():
-            raise SystemExit(f"Download {name} to {snapshot}; see docs/psychology.md.")
+            raise SystemExit(f"Download {name} to {snapshot}; see docs/wikipedia-realms.md.")
     page_titles = {}
     with bz2.open(snapshot / TITLE_INDEX, "rt", encoding="utf-8") as stream:
         for line in stream:
@@ -176,18 +176,14 @@ def select(candidates_path, article_paths, snapshot, minimum_incoming, minimum_s
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--realm", required=True)
     parser.add_argument("--snapshot", type=Path, default=SNAPSHOT)
-    commands = parser.add_subparsers(dest="command", required=True)
-    grow = commands.add_parser("expand")
-    grow.add_argument("--minimum-links", type=int, default=10)
-    choose = commands.add_parser("select")
-    choose.add_argument("--minimum-incoming", type=int, default=3, help="links from trusted articles that keep a low-rated article or a person")
-    choose.add_argument("--minimum-seed-links", type=int, default=3, help="links from trusted articles that a Wikidata class member needs")
-    choose.add_argument("--minimum-neighbour-links", type=int, default=10, help="links from trusted articles that an outside article needs")
-    choose.add_argument("--minimum-share", type=float, default=0.2, help="share of an untrusted article's own links that must stay in the field")
+    parser.add_argument("command", choices=["expand", "select"])
     args = parser.parse_args()
     snapshot = args.snapshot.resolve()
+    work = work_directory(args.realm, snapshot)
+    thresholds = load_scope(args.realm)["selection"]
     if args.command == "expand":
-        expand(snapshot / "candidates.json", snapshot / "candidates.jsonl", snapshot, args.minimum_links, snapshot / "neighbours.json")
+        expand(work / "candidates.json", work / "candidates.jsonl", snapshot, thresholds["expandLinks"], work / "neighbours.json")
     else:
-        select(snapshot / "candidates.json", [snapshot / "candidates.jsonl", snapshot / "neighbours.jsonl"], snapshot, args.minimum_incoming, args.minimum_seed_links, args.minimum_neighbour_links, args.minimum_share, snapshot / "selected.json")
+        select(work / "candidates.json", [work / "candidates.jsonl", work / "neighbours.jsonl"], snapshot, thresholds["incoming"], thresholds["seedLinks"], thresholds["neighbourLinks"], thresholds["share"], work / "selected.json")
