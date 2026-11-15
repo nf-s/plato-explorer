@@ -45,10 +45,11 @@ FILE_LIMIT = 20000
 ARTICLES_BINDING = "ARTICLES"
 COMPATIBILITY_DATE = "2026-01-01"
 # Wrangler uploads objects through the Cloudflare API, which accepts 1,200
-# requests in five minutes. Each batch stays under that and is recorded when
-# it finishes, so an interrupted upload resumes.
-UPLOAD_BATCH = 1000
-UPLOAD_INTERVAL = 300
+# requests in five minutes. Each attempt at a batch stays under that, and a
+# batch is recorded when it finishes, so an interrupted upload resumes.
+UPLOAD_BATCH = 100
+UPLOAD_INTERVAL = 30
+UPLOAD_ATTEMPTS = 5
 
 
 def stage(files, destination):
@@ -115,6 +116,29 @@ def pending(current, uploaded):
     return sorted(key for key, digest in current.items() if uploaded.get(key) != digest)
 
 
+def wait_for_request_limit(began):
+    time.sleep(max(0.0, UPLOAD_INTERVAL - (time.monotonic() - began)))
+
+
+def put_batch(command, bucket, pairs, working_directory):
+    """Upload the listed articles and return when the upload began.
+
+    Wrangler stops a batch at the first object Cloudflare rejects, so a failed batch is sent again."""
+    for _ in range(UPLOAD_ATTEMPTS):
+        began = time.monotonic()
+        result = subprocess.run(
+            command + ["r2", "bulk", "put", bucket, "--remote", "--force", "--filename", str(pairs),
+                       "--content-type", "application/json"],
+            cwd=working_directory,
+            check=False,
+            stdout=subprocess.DEVNULL,
+        )
+        if result.returncode == 0:
+            return began
+        wait_for_request_limit(began)
+    raise SystemExit(f"A batch failed {UPLOAD_ATTEMPTS} times. Run the same command again to resume.")
+
+
 def upload_articles(command, bucket, realm):
     """Upload the realm's new and changed articles, one object each."""
     files = article_files(realm)
@@ -128,21 +152,14 @@ def upload_articles(command, bucket, realm):
         working_directory = clean_directory(temporary)
         pairs = working_directory / "articles.json"
         for start in range(0, len(keys), UPLOAD_BATCH):
-            began = time.monotonic()
             batch = keys[start:start + UPLOAD_BATCH]
             pairs.write_text(json.dumps([{"key": key, "file": str(files[key])} for key in batch]))
-            subprocess.run(
-                command + ["r2", "bulk", "put", bucket, "--remote", "--force", "--filename", str(pairs),
-                           "--content-type", "application/json"],
-                cwd=working_directory,
-                check=True,
-                stdout=subprocess.DEVNULL,
-            )
+            began = put_batch(command, bucket, pairs, working_directory)
             uploaded.update((key, current[key]) for key in batch)
             record.write_text(json.dumps(uploaded, sort_keys=True) + "\n")
             print(f"{realm.name}: {min(start + UPLOAD_BATCH, len(keys)):,} uploaded", flush=True)
             if start + UPLOAD_BATCH < len(keys):
-                time.sleep(max(0.0, UPLOAD_INTERVAL - (time.monotonic() - began)))
+                wait_for_request_limit(began)
     stale = sorted(set(uploaded) - set(current))
     if stale:
         print(f"{realm.name}: {len(stale):,} uploaded articles are no longer in the graph; see docs/public-deployment.md.", flush=True)

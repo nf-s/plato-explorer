@@ -37,7 +37,7 @@ The app release binds the bucket to the Function as `ARTICLES`, so no dashboard 
 
 `--articles <realm>` uploads the articles that are new or have changed since the last upload from this checkout. It keeps a record of what it uploaded in `.artifacts/uploaded/<bucket>/<realm>.json`. Without that record every article is uploaded again, which is safe and slow.
 
-Wrangler uploads objects through the Cloudflare API, which accepts 1,200 requests in five minutes. The script sends 1,000 articles, records them and waits for the rest of the five minutes, so a realm of 10,000 articles takes about 50 minutes and an interrupted upload resumes where it stopped. The upload uses `wrangler r2 bulk put`, which Wrangler marks experimental.
+Wrangler uploads objects through the Cloudflare API, which accepts 1,200 requests in five minutes. The script sends 100 articles, records them and waits for the rest of 30 seconds, so a realm of 10,000 articles takes about 50 minutes and an interrupted upload resumes where it stopped. Wrangler stops a batch at the first article Cloudflare rejects, so the script sends a failed batch again, up to five times. The upload uses `wrangler r2 bulk put`, which Wrangler marks experimental.
 
 An article dropped from a realm's graph stays in the bucket. The script reports how many there are. The app no longer links to them. Remove one with `wrangler r2 object delete <bucket>/<realm>/articles/<node>.json --remote`.
 
