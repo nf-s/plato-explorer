@@ -1,0 +1,40 @@
+{
+  "blocked": {
+    "art-institute-of-chicago": [
+      "art institute"
+    ],
+    "exposition-universelle-1855": [
+      "Exposition Universelle"
+    ],
+    "florence-cathedral": [
+      "Duomo"
+    ],
+    "guild-of-saint-luke": [
+      "guild"
+    ],
+    "legion-of-honor-museum": [
+      "Legion of Honor"
+    ],
+    "museum-of-fine-arts-houston": [
+      "Museum of Fine Arts",
+      "The Museum of Fine Arts"
+    ],
+    "pop-art": [
+      "Pop"
+    ],
+    "pottery": [
+      "fired"
+    ],
+    "san-marco-florence": [
+      "San Marco"
+    ],
+    "sao-paulo-art-biennial": [
+      "São Paulo"
+    ],
+    "theo-van-gogh-art-dealer": [
+      "Theo"
+    ]
+  },
+  "excludedPhrases": [],
+  "contextual": {}
+}

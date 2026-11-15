@@ -66,5 +66,13 @@
   { "philosophy": "russellian-monism", "philosophy-wikipedia": "neutral-monism" },
   { "philosophy": "schema", "philosophy-wikipedia": "schema-kant" },
   { "philosophy": "scientific-progress", "philosophy-wikipedia": "progress" },
-  { "philosophy": "vegetarianism", "philosophy-wikipedia": "veganism" }
+  { "philosophy": "vegetarianism", "philosophy-wikipedia": "veganism" },
+  { "philosophy": "dance", "art": "dance-matisse" },
+  { "philosophy": "francis-bacon", "art": "francis-bacon-artist" },
+  { "philosophy": "james-ward", "art": "james-ward-english-artist" },
+  { "philosophy": "life", "art": "life-magazine" },
+  { "philosophy": "weber", "art": "max-weber-artist" },
+  { "philosophy": "realism", "art": "realism-arts" },
+  { "philosophy": "secession", "art": "secession-art" },
+  { "philosophy": "keyword-yoga", "art": "yoga" }
 ]

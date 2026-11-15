@@ -16,6 +16,11 @@ WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
 WIKIDATA_SPARQL = "https://query.wikidata.org/sparql"
 SNAPSHOT = ROOT / "data/wikipedia"
 IMPORTANCE = ["Top", "High", "Mid", "Low"]
+# Some WikiProjects rate quality and not importance. Their articles are nominated at the
+# lowest importance, so each still needs links from the field to be kept.
+QUALITY = ["FA", "GA", "B", "C", "Start", "Stub"]
+QUALITY_IMPORTANCE = "Low"
+SCOPE_FIELDS = {"wikiProjects", "importance", "wikidataSeeds", "selection", "subjects"}
 SELECTION = ("expandLinks", "incoming", "seedLinks", "neighbourLinks", "share")
 
 
@@ -68,12 +73,16 @@ def cached(directory, name, fetch):
 def load_scope(realm):
     """Read realms/<realm>/scope.json: where candidates come from, how they are selected and how subjects are estimated."""
     scope = json.loads((ROOT / "realms" / realm / "scope.json").read_text())
-    if not isinstance(scope, dict) or set(scope) != {"wikiProjects", "importance", "wikidataSeeds", "selection", "subjects"}:
+    if not isinstance(scope, dict) or not SCOPE_FIELDS <= set(scope) <= SCOPE_FIELDS | {"quality"}:
         raise ValueError(f"Invalid scope for {realm}")
-    if not scope["wikiProjects"] or not all(isinstance(category, str) and "{importance}" in category for category in scope["wikiProjects"]):
+    # Each category names one rating: "{importance}-importance X articles" or "{quality}-Class X articles".
+    if not scope["wikiProjects"] or not all(isinstance(category, str) and ("{importance}" in category) != ("{quality}" in category) for category in scope["wikiProjects"]):
         raise ValueError(f"Invalid WikiProject categories for {realm}")
     if not scope["importance"] or not set(scope["importance"]) <= set(IMPORTANCE):
         raise ValueError(f"Invalid importance levels for {realm}")
+    by_quality = any("{quality}" in category for category in scope["wikiProjects"])
+    if by_quality != bool(scope.get("quality")) or not set(scope.get("quality", [])) <= set(QUALITY):
+        raise ValueError(f"Invalid quality classes for {realm}")
     for seed in scope["wikidataSeeds"]:
         if not isinstance(seed, dict) or set(seed) != {"name", "pattern", "person"} or not isinstance(seed["person"], bool):
             raise ValueError(f"Invalid Wikidata seed for {realm}")
@@ -86,6 +95,17 @@ def load_scope(realm):
     return scope
 
 
+def rated_categories(scope):
+    """Yield each assessment category with the importance its articles are nominated at."""
+    for template in scope["wikiProjects"]:
+        if "{quality}" in template:
+            for quality in scope["quality"]:
+                yield template.format(quality=quality), QUALITY_IMPORTANCE
+        else:
+            for importance in scope["importance"]:
+                yield template.format(importance=importance), importance
+
+
 def work_directory(realm, snapshot=SNAPSHOT):
     """Each realm keeps its candidate lists and copied articles in its own folder beside the snapshot."""
     return snapshot / realm
@@ -96,16 +116,14 @@ def build(realm, snapshot=SNAPSHOT):
     work = work_directory(realm, snapshot)
     cache = work / "scope-cache"
     titles = {}
-    for template in scope["wikiProjects"]:
-        for importance in scope["importance"]:
-            category = template.format(importance=importance)
-            found, _ = cached(cache, category, lambda: list(category_titles(category)))
-            for title in found:
-                entry = titles.setdefault(title, {"importance": importance, "seeds": [], "person": False})
-                # An article rated by several projects keeps its highest rating.
-                if IMPORTANCE.index(importance) < IMPORTANCE.index(entry["importance"]):
-                    entry["importance"] = importance
-            print(f"{category}: {len(found):,} articles", flush=True)
+    for category, importance in rated_categories(scope):
+        found, _ = cached(cache, category, lambda: list(category_titles(category)))
+        for title in found:
+            entry = titles.setdefault(title, {"importance": importance, "seeds": [], "person": False})
+            # An article rated by several projects keeps its highest rating.
+            if IMPORTANCE.index(importance) < IMPORTANCE.index(entry["importance"]):
+                entry["importance"] = importance
+        print(f"{category}: {len(found):,} articles", flush=True)
     for seed in scope["wikidataSeeds"]:
         found, reused = cached(cache, "wikidata " + seed["name"], lambda: seed_titles(seed["pattern"]))
         for title in found:

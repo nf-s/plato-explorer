@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from build_realm_links import same_articles, shared_nodes
 from wikipedia_rows import article_ids, convert, is_person, matching_terms, subject, subject_patterns
-from wikipedia_scope import load_scope
+from wikipedia_scope import load_scope, rated_categories
 from wikipedia_select import link_title, outgoing_titles
 
 
@@ -159,6 +159,28 @@ class ScopeTests(unittest.TestCase):
             patterns, _ = subject_patterns(load_scope(name))
             listed = [entry[0] for entry in json.loads((realms / name / "realm.json").read_text())["subjects"]]
             self.assertEqual([*patterns, "Other / interdisciplinary"], listed)
+
+
+    def test_a_project_that_rates_quality_alone_nominates_at_the_lowest_importance(self):
+        scope = {
+            "wikiProjects": ["{quality}-Class Visual arts articles", "{importance}-importance Photography articles"],
+            "importance": ["Top", "High"],
+            "quality": ["GA", "B"],
+        }
+        self.assertEqual(list(rated_categories(scope)), [
+            ("GA-Class Visual arts articles", "Low"),
+            ("B-Class Visual arts articles", "Low"),
+            ("Top-importance Photography articles", "Top"),
+            ("High-importance Photography articles", "High"),
+        ])
+
+    def test_every_scope_names_the_ratings_its_categories_use(self):
+        realms = Path(__file__).resolve().parents[1] / "realms"
+        for path in sorted(realms.glob("*/scope.json")):
+            scope = load_scope(path.parent.name)
+            for category, importance in rated_categories(scope):
+                self.assertNotIn("{", category)
+                self.assertIn(importance, ["Top", "High", "Mid", "Low"])
 
 
 class PartnerLinkTests(unittest.TestCase):

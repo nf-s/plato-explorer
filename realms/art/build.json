@@ -1,0 +1,5 @@
+{
+  "source": "data/art/articles.parquet",
+  "curation": "realms/art",
+  "people": null
+}

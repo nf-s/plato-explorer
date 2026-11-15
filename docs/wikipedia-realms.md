@@ -10,6 +10,7 @@ Every realm except the SEP's Philosophy is built from English Wikipedia articles
 | Society    | WikiProjects Sociology and Anthropology; sociologists and anthropologists                      | 9,154    | 2,519  |
 | Religion   | WikiProject Religion; theologians                                                              | 10,421   | 2,988  |
 | Mythology  | WikiProjects Mythology and Folklore                                                            | 6,939    | 249    |
+| Art        | WikiProject Visual arts by quality; top-rated Photography and Graphic design                   | 9,898    | 5,293  |
 
 The counts are from the snapshot revision below.
 
@@ -64,14 +65,16 @@ Candidates come from two places, both listed in the realm's `scope.json`. WikiPr
 
 Wikidata classes include many unrelated items. The emotion tree reaches national anthems and psalms. Selection therefore counts links from _trusted_ articles, meaning those the WikiProject rates or people found by occupation.
 
-| Article                              | Kept when                                                             |
-| ------------------------------------ | --------------------------------------------------------------------- |
-| Rated Top, High or Mid               | Always                                                                |
-| Rated Low, or a person by occupation | At least 3 trusted articles link to it                                |
-| Wikidata class member only           | At least 3 trusted links, and 20% of its own links stay in the field  |
-| Not nominated, linked from the field | At least 10 trusted links, and 20% of its own links stay in the field |
+| Article                                                  | Kept when                                                             |
+| -------------------------------------------------------- | --------------------------------------------------------------------- |
+| Rated Top, High or Mid                                   | Always                                                                |
+| Rated Low or by quality alone, or a person by occupation | At least 3 trusted articles link to it                                |
+| Wikidata class member only                               | At least 3 trusted links, and 20% of its own links stay in the field  |
+| Not nominated, linked from the field                     | At least 10 trusted links, and 20% of its own links stay in the field |
 
-The last row is how the corpus grows beyond the seeds. It adds articles such as neurotransmitters and statistical methods that the field relies on. Each threshold is set under `selection` in `scope.json`. Religion and Philosophy use 5 trusted links for the second row and 25 for the last, which keeps each near 10,000 articles and its graph file under the 25 MiB that Pages accepts.
+The last row is how the corpus grows beyond the seeds. It adds articles such as neurotransmitters and statistical methods that the field relies on. Each threshold is set under `selection` in `scope.json`. Religion and Philosophy use 5 trusted links for the second row and 25 for the last, which keeps each near 10,000 articles and its graph file under the 25 MiB that Pages accepts. Art uses 7 and 25.
+
+WikiProject Visual arts rates quality and not importance. A category written with `{quality}` in `scope.json`, such as `{quality}-Class Visual arts articles`, nominates the classes listed under `quality`. Those articles count as rated Low, so each needs links from the field. Art takes the classes from Featured to Start and leaves out stubs. It nominates no architecture project, because WikiProject Architecture rates 75,000 articles. Buildings and styles that art articles link to often still arrive through the last row. Art has no Wikidata seeds: the query service refused requests during an outage when the realm was built, and nearly every artist's article is already in the project.
 
 ## How mentions are matched
 

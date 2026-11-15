@@ -1,0 +1,75 @@
+{
+  "id": "art",
+  "name": "Art",
+  "description": "Browse visual art articles and connections in English Wikipedia.",
+  "source": {
+    "name": "Wikipedia",
+    "shortName": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Portal:Visual_arts",
+    "hosts": [
+      "en.wikipedia.org"
+    ],
+    "footer": "Wikipedia text · CC BY-SA 4.0",
+    "articleRights": "Text by Wikipedia contributors, available under the Creative Commons Attribution-ShareAlike 4.0 licence. The original article links to its authors and history. ",
+    "readerNotice": "Links and highlights were added by this visualization, which is not affiliated with the Wikimedia Foundation. ",
+    "copyrightUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "about": {
+    "copyright": [
+      "Article text comes from English Wikipedia and its contributors, under the Creative Commons Attribution-ShareAlike 4.0 licence. The reader shows each article's revision and links to the original, where its authors and history are listed. Tables, images, references and infoboxes are omitted. Detected links and highlights are additions.",
+      "This visualization is independent and is not affiliated with or endorsed by the Wikimedia Foundation. "
+    ],
+    "copyrightLink": "CC BY-SA 4.0 licence",
+    "commonTermExamples": "Painting, Sculpture, and Drawing",
+    "subjectNote": "they are not Wikipedia categories"
+  },
+  "defaults": {
+    "minimumMentions": 5
+  },
+  "subjects": [
+    [
+      "Painting",
+      "#b97559"
+    ],
+    [
+      "Sculpture",
+      "#a57290"
+    ],
+    [
+      "Drawing & printmaking",
+      "#7b75a6"
+    ],
+    [
+      "Photography & film",
+      "#638f9e"
+    ],
+    [
+      "Architecture",
+      "#998678"
+    ],
+    [
+      "Design & decorative arts",
+      "#b29854"
+    ],
+    [
+      "Movements & styles",
+      "#6887b3"
+    ],
+    [
+      "Museums & market",
+      "#a48a6a"
+    ],
+    [
+      "History & traditions",
+      "#8a8fb5"
+    ],
+    [
+      "Techniques & materials",
+      "#ad6b6b"
+    ],
+    [
+      "Other / interdisciplinary",
+      "#94a0ac"
+    ]
+  ]
+}

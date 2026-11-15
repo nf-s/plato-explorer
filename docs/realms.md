@@ -11,6 +11,7 @@ A realm is one corpus with its own graph, articles and search index. The app sho
 | `society`              | Society    | Sociology and anthropology | English Wikipedia                   | [Wikipedia realms](wikipedia-realms.md) |
 | `religion`             | Religion   | Religion and theology      | English Wikipedia                   | [Wikipedia realms](wikipedia-realms.md) |
 | `mythology`            | Mythology  | Mythology and folklore     | English Wikipedia                   | [Wikipedia realms](wikipedia-realms.md) |
+| `art`                  | Art        | Visual art                 | English Wikipedia                   | [Wikipedia realms](wikipedia-realms.md) |
 
 The two Philosophy realms share a name. The realm menu shows each realm's source beneath its name, and a link from another realm reads “Philosophy (SEP)” or “Philosophy (Wikipedia)”.
 

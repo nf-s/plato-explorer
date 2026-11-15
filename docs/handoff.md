@@ -30,6 +30,8 @@ Read the [working instructions](../AGENTS.md), then use the relevant entry below
 
 ## Release record and verification
 
+On 16 November 2026 an Art realm was added at the user's request. WikiProject Visual arts rates quality and not importance, so a scope can now nominate articles by quality class; they are kept on the same link test as Low-rated articles. The realm has 9,898 articles, 5,293 of them people, 268,914 connections and a 12.5 MiB graph. Eleven aliases that the link measurements accepted wrongly, such as “fired” for Pottery, are blocked in `realms/art/mention_rules.json`, and eight false links to the SEP realm are excluded. Wikidata's query service refused requests during an outage, so the realm has no Wikidata seeds. It was browser-checked locally at desktop and 375px widths: graph, reader, full-text search and links between realms, with no console errors. It was not released, and its articles are not in the bucket.
+
 Later again on 15 November 2026 the storage for releases changed and a second Philosophy realm was added from Wikipedia, at the user's request.
 
 - **Storage.** The six per-realm data projects described in the next entry were created and uploaded, then withdrawn before the app used them. Cloudflare's Self-Serve Subscription Agreement does not allow use intended to circumvent a service's limits, and the projects existed only to stay under the 20,000-file limit. Articles now go to an R2 bucket, one object each, and a Pages Function serves them. Everything else is static in the app's project. [Where a release keeps the data](realms.md#where-a-release-keeps-the-data)

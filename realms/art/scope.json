@@ -1,0 +1,68 @@
+{
+  "wikiProjects": [
+    "{quality}-Class Visual arts articles",
+    "{importance}-importance Photography articles",
+    "{importance}-importance Graphic design articles"
+  ],
+  "importance": [
+    "Top",
+    "High"
+  ],
+  "quality": [
+    "FA",
+    "GA",
+    "B",
+    "C",
+    "Start"
+  ],
+  "wikidataSeeds": [],
+  "selection": {
+    "expandLinks": 25,
+    "incoming": 7,
+    "seedLinks": 3,
+    "neighbourLinks": 25,
+    "share": 0.2
+  },
+  "subjects": {
+    "Painting": {
+      "terms": "paint\\w*|fresco\\w*|watercolou?r\\w*|mural\\w*|portrait\\w*|landscape\\w*|still life|altarpiece\\w*|oil on canvas|tempera|canvas\\w*|triptych\\w*|miniature\\w*",
+      "seeds": []
+    },
+    "Sculpture": {
+      "terms": "sculpt\\w*|statue\\w*|bronze\\w*|marble\\w*|relief\\w*|bust|carving\\w*|monument\\w*|figurine\\w*|terracotta|installation art|land art",
+      "seeds": []
+    },
+    "Drawing & printmaking": {
+      "terms": "draw\\w*|draughts\\w*|printmak\\w*|prints?|engrav\\w*|etch\\w*|lithograph\\w*|woodcut\\w*|woodblock\\w*|illustrat\\w*|cartoon\\w*|caricatur\\w*|comics?|poster\\w*|calligraph\\w*|manuscript\\w*|illuminat\\w*",
+      "seeds": []
+    },
+    "Photography & film": {
+      "terms": "photograph\\w*|camera\\w*|daguerreotyp\\w*|photojournalis\\w*|films?|filmmak\\w*|video\\w*|digital art|new media|cinema\\w*|animation",
+      "seeds": []
+    },
+    "Architecture": {
+      "terms": "architect\\w*|buildings?|cathedral\\w*|church\\w*|palace\\w*|temple\\w*|basilica\\w*|mosque\\w*|castle\\w*|urban planning",
+      "seeds": []
+    },
+    "Design & decorative arts": {
+      "terms": "design\\w*|decorative|ceramic\\w*|potter\\w*|porcelain|textile\\w*|tapestr\\w*|furniture|jewel\\w*|glass\\w*|craft\\w*|typograph\\w*|fashion\\w*|ornament\\w*|mosaic\\w*|enamel\\w*|metalwork\\w*|embroider\\w*|weaving|goldsmith\\w*|silversmith\\w*",
+      "seeds": []
+    },
+    "Movements & styles": {
+      "terms": "art movement\\w*|movement\\w*|style\\w*|renaissance|baroque|rococo|gothic|romanesque|neoclassic\\w*|manneris\\w*|impressionis\\w*|expressionis\\w*|cubis\\w*|surrealis\\w*|modernis\\w*|realis\\w*|romanticis\\w*|minimalis\\w*|futuris\\w*|dada\\w*|symbolis\\w*|constructivis\\w*|postmodern\\w*|avant-garde|pop art|conceptual art|abstract\\w*|art nouveau|art deco|bauhaus|pre-raphaelite\\w*",
+      "seeds": []
+    },
+    "Museums & market": {
+      "terms": "museum\\w*|galler\\w*|collection\\w*|collector\\w*|auction\\w*|exhibition\\w*|biennial\\w*|biennale\\w*|art dealer\\w*|curator\\w*|patron\\w*|academy|academies|salon\\w*|art school\\w*",
+      "seeds": []
+    },
+    "History & traditions": {
+      "terms": "art histor\\w*|historian\\w*|critic\\w*|theor\\w*|aesthetic\\w*|iconograph\\w*|archaeolog\\w*|ancient|medieval|prehistoric|antiquit\\w*|byzantine|egyptian|greek|roman|islamic|chinese|japanese|african|indian|persian",
+      "seeds": []
+    },
+    "Techniques & materials": {
+      "terms": "technique\\w*|pigment\\w*|perspective|colou?rs?|oil paint|acrylic\\w*|varnish\\w*|gilding|conservation|restoration|chiaroscuro|composition|brush\\w*|inks?|dyes?|paper",
+      "seeds": []
+    }
+  }
+}
