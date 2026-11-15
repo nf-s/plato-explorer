@@ -1,6 +1,6 @@
 # AGENTS.md
 
-These instructions apply to work in Plato Explorer. Start with the [project handoff](docs/handoff.md) for decisions and the [README](README.md) for commands. The production target is the public Cloudflare Pages project `plato-network`. Its release procedure is in [public deployment](docs/public-deployment.md). The app shows one realm at a time: Philosophy from the SEP, and Psychology, Economics, Society, Religion and Mythology from Wikipedia. Realm settings live under `realms/`, and changes to `web/` affect every realm. [Realms](docs/realms.md)
+These instructions apply to work in Plato Explorer. Start with the [project handoff](docs/handoff.md) for decisions and the [README](README.md) for commands. The production target is the public Cloudflare Pages project `plato-network`. Its release procedure is in [public deployment](docs/public-deployment.md). The app shows one realm at a time: Philosophy from the SEP, and Philosophy, Psychology, Economics, Society, Religion and Mythology from Wikipedia. Realm settings live under `realms/`, and changes to `web/` affect every realm. [Realms](docs/realms.md)
 
 ## Hosting and source publication — apply across projects
 

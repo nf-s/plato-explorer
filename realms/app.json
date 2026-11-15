@@ -1,7 +1,9 @@
 {
   "pagesProject": "plato-network",
+  "articlesBucket": "plato-network-articles",
   "realms": [
     "philosophy",
+    "philosophy-wikipedia",
     "psychology",
     "economics",
     "society",

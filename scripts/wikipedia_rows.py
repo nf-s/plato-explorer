@@ -195,12 +195,19 @@ def matching_terms(documents, title_share, alias_share, alias_lift, surname_shar
                 display.setdefault(key(text), clean_text(text))
     candidates = {}
     title_owner = {}
+    short_owner = {}
     surnames = {}
     for document in documents:
         title = key(document["title"])
         title_owner[title] = document["id"]
         candidates.setdefault(title, set()).add(document["id"])
         display[title] = document["title"]
+        # The graph builder also matches a title without its leading "The", so "The Man" would claim every "man".
+        short = document["title"][4:] if document["title"].lower().startswith("the ") else ""
+        if len(key(short)) >= 3:
+            short_owner.setdefault(key(short), document["id"])
+            candidates.setdefault(key(short), set()).add(document["id"])
+            display.setdefault(key(short), short)
         base = base_title(document["title"])
         if base != document["title"] and len(key(base)) >= 3:
             candidates.setdefault(key(base), set()).add(document["id"])
@@ -210,6 +217,9 @@ def matching_terms(documents, title_share, alias_share, alias_lift, surname_shar
             surnames[document["id"]] = key(words[-1])
             candidates.setdefault(key(words[-1]), set()).add(document["id"])
             display.setdefault(key(words[-1]), words[-1])
+    # An article whose whole title is the shorter phrase keeps it.
+    for phrase, owner in short_owner.items():
+        title_owner.setdefault(phrase, owner)
     for phrase, targets in anchor_sources.items():
         for target, sources in targets.items():
             if len(sources) >= 2:
@@ -249,6 +259,11 @@ def matching_terms(documents, title_share, alias_share, alias_lift, surname_shar
             # An unsupported title would link ordinary uses of the phrase to this article.
             blocked.setdefault(owner, []).append(display[phrase])
         report.append({"phrase": display[phrase], "target": owner, "share": round(share, 3), "lift": round(share / usual, 1), "linking": len(linking), "uses": len(others), "accepted": accepted, "title": is_title})
+    # Where another article is titled with the shorter phrase, the phrase is that article's to
+    # keep or lose. Left unblocked, "man" would fall to The Man once Man's own title is blocked.
+    for phrase, owner in short_owner.items():
+        if title_owner[phrase] != owner:
+            blocked.setdefault(owner, []).append(display[phrase])
     return aliases, blocked, report
 
 

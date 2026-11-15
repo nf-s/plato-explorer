@@ -1,6 +1,5 @@
-// A realm is one corpus with its own graph, articles and search index. The
-// realm list says where each realm's data is. The copy that names its source
-// comes from its realm.json.
+// A realm is one corpus with its own graph, articles and search index under
+// data/<realm>/. The copy that names its source comes from its realm.json.
 function record(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -20,15 +19,6 @@ function httpsUrl(value) {
 
 const REALM_ID = /^[a-z][a-z0-9-]*$/;
 
-// A realm's data sits beside the app in a local build. A release serves each
-// realm from an address of its own.
-function dataAddress(value, id) {
-  return (
-    value === `./data/${id}/` ||
-    (httpsUrl(value) && new URL(value).href === value && value.endsWith("/"))
-  );
-}
-
 // The realm menu lists every built realm; the first is the default.
 export function validateRealms(data) {
   if (
@@ -42,18 +32,16 @@ export function validateRealms(data) {
         REALM_ID.test(entry.id) &&
         ["name", "source", "sourceShortName"].every((field) =>
           text(entry[field]),
-        ) &&
-        dataAddress(entry.data, entry.id),
+        ),
     ) ||
     new Set(data.realms.map((entry) => entry.id)).size !== data.realms.length
   )
     throw new Error("The realm list has an unsupported format.");
-  return data.realms.map(({ id, name, source, sourceShortName, data }) => ({
+  return data.realms.map(({ id, name, source, sourceShortName }) => ({
     id,
     name,
     source,
     sourceShortName,
-    data,
   }));
 }
 
@@ -70,8 +58,18 @@ export function realmHref(realms, id, nodeId = null) {
   return `./${query}${hash}`;
 }
 
+// Two realms can cover one field from different sources. A name that another
+// realm shares is followed by its source.
+export function realmLabel(realms, realm) {
+  return realms.some(
+    (other) => other.id !== realm.id && other.name === realm.name,
+  )
+    ? `${realm.name} (${realm.sourceShortName})`
+    : realm.name;
+}
+
 export function dataPath(realm) {
-  return realm.data;
+  return `./data/${realm.id}/`;
 }
 
 export function validateRealm(data, id) {

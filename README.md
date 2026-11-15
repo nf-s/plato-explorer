@@ -32,7 +32,7 @@ Open `http://127.0.0.1:5173` in your browser.
 
 ## Realms
 
-The explorer shows one realm at a time. Philosophy is the SEP. Psychology, Economics, Society, Religion and Mythology each hold 7,000 to 10,000 English Wikipedia articles, and their builds need a 35 GB Wikipedia snapshot. A node found in several realms links to the others. [Realms](docs/realms.md) · [Wikipedia sources and build steps](docs/wikipedia-realms.md)
+The explorer shows one realm at a time. Philosophy is offered twice, from the SEP and from English Wikipedia. Psychology, Economics, Society, Religion and Mythology come from Wikipedia. Each Wikipedia realm holds 7,000 to 10,000 articles, and their builds need a 35 GB Wikipedia snapshot. A node found in several realms links to the others. [Realms](docs/realms.md) · [Wikipedia sources and build steps](docs/wikipedia-realms.md)
 
 ```sh
 python scripts/build_wikipedia_realm.py --realm psychology

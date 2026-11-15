@@ -6,6 +6,7 @@ import {
   dataPath,
   linkedRealms,
   realmHref,
+  realmLabel,
   validateLinks,
   validateRealm,
   validateRealms,
@@ -27,14 +28,12 @@ function realmList() {
         name: "Philosophy",
         source: "Stanford Encyclopedia of Philosophy",
         sourceShortName: "SEP",
-        data: "./data/philosophy/",
       },
       {
         id: "psychology",
         name: "Psychology",
         source: "Wikipedia",
         sourceShortName: "Wikipedia",
-        data: "https://realm-data.example/",
       },
     ],
   });
@@ -92,8 +91,7 @@ test("the address chooses a realm and earlier addresses open the default", () =>
     realmHref(realms, "psychology", "music-psychology"),
     "./?realm=psychology#/music-psychology",
   );
-  assert.equal(dataPath(realms[0]), "./data/philosophy/");
-  assert.equal(dataPath(realms[1]), "https://realm-data.example/");
+  assert.equal(dataPath(realms[1]), "./data/psychology/");
 });
 
 test("the realm list rejects empty, duplicate and unsafe entries", () => {
@@ -102,7 +100,6 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     name: "Philosophy",
     source: "SEP",
     sourceShortName: "SEP",
-    data: "./data/philosophy/",
   };
   for (const data of [
     {},
@@ -110,10 +107,7 @@ test("the realm list rejects empty, duplicate and unsafe entries", () => {
     { realms: [entry, entry] },
     { realms: [{ ...entry, id: "../secrets" }] },
     { realms: [{ ...entry, name: "" }] },
-    { realms: [{ ...entry, data: "./data/psychology/" }] },
-    { realms: [{ ...entry, data: "http://realm-data.example/" }] },
-    { realms: [{ ...entry, data: "https://realm-data.example/data" }] },
-    { realms: [{ ...entry, data: undefined }] },
+    { realms: [{ ...entry, sourceShortName: undefined }] },
   ])
     assert.throws(() => validateRealms(data), /unsupported format/u);
 });
@@ -151,5 +145,34 @@ test("links to other realms open the matching node and ignore unknown nodes and 
         realms.slice(1),
       ),
     /invalid node/u,
+  );
+});
+
+test("realms that share a name are told apart by their source", () => {
+  const realms = validateRealms({
+    realms: [
+      {
+        id: "philosophy",
+        name: "Philosophy",
+        source: "Stanford Encyclopedia of Philosophy",
+        sourceShortName: "SEP",
+      },
+      {
+        id: "philosophy-wikipedia",
+        name: "Philosophy",
+        source: "Wikipedia",
+        sourceShortName: "Wikipedia",
+      },
+      {
+        id: "psychology",
+        name: "Psychology",
+        source: "Wikipedia",
+        sourceShortName: "Wikipedia",
+      },
+    ],
+  });
+  assert.deepEqual(
+    realms.map((realm) => realmLabel(realms, realm)),
+    ["Philosophy (SEP)", "Philosophy (Wikipedia)", "Psychology"],
   );
 });

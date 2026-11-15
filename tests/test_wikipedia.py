@@ -127,6 +127,28 @@ class MatchingTermTests(unittest.TestCase):
         self.assertFalse(entry["accepted"])
         self.assertEqual(entry["uses"], 33)
 
+    def test_a_title_is_matched_without_its_leading_article_only_when_links_support_it(self):
+        def document(article_id, title, paragraphs, anchors=()):
+            return {"id": article_id, "title": title, "person": False, "paragraphs": paragraphs, "anchors": list(anchors)}
+
+        documents = [
+            document("the-man", "The Man", ["A slang phrase."]),
+            document("the-buddha", "The Buddha", ["A teacher."]),
+            document("philosopher", "Philosopher", ["A person who practises philosophy."]),
+            document("the-philosopher", "The Philosopher", ["A periodical."]),
+        ]
+        documents.extend(document(f"sutra-{number}", f"Sutra {number}", ["A man asked what Buddha taught the philosopher. Another philosopher listened."], [("Buddha", "the-buddha")]) for number in range(30))
+        _, blocked, report = matching_terms(documents, 0.05, 0.1, 3.0, 0.5)
+        self.assertEqual(blocked["the-man"], ["Man"])
+        self.assertNotIn("the-buddha", blocked)
+        # "Philosopher" is another article's whole title. When that title is blocked the phrase
+        # must not fall to the periodical.
+        self.assertEqual(blocked["philosopher"], ["Philosopher"])
+        self.assertEqual(blocked["the-philosopher"], ["The Philosopher", "Philosopher"])
+        self.assertEqual(next(row for row in report if row["phrase"] == "Philosopher")["target"], "philosopher")
+        entry = next(row for row in report if row["phrase"] == "Man")
+        self.assertEqual((entry["target"], entry["uses"], entry["linking"], entry["accepted"]), ("the-man", 30, 0, False))
+
 
 class ScopeTests(unittest.TestCase):
     def test_every_wikipedia_realm_estimates_the_subjects_its_interface_lists(self):

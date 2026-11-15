@@ -1,0 +1,71 @@
+{
+  "id": "philosophy-wikipedia",
+  "name": "Philosophy",
+  "description": "Browse philosophy articles and connections in English Wikipedia.",
+  "source": {
+    "name": "Wikipedia",
+    "shortName": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Portal:Philosophy",
+    "hosts": [
+      "en.wikipedia.org"
+    ],
+    "footer": "Wikipedia text · CC BY-SA 4.0",
+    "articleRights": "Text by Wikipedia contributors, available under the Creative Commons Attribution-ShareAlike 4.0 licence. The original article links to its authors and history. ",
+    "readerNotice": "Links and highlights were added by this visualization, which is not affiliated with the Wikimedia Foundation. ",
+    "copyrightUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "about": {
+    "copyright": [
+      "Article text comes from English Wikipedia and its contributors, under the Creative Commons Attribution-ShareAlike 4.0 licence. The reader shows each article's revision and links to the original, where its authors and history are listed. Tables, images, references and infoboxes are omitted. Detected links and highlights are additions.",
+      "This visualization is independent and is not affiliated with or endorsed by the Wikimedia Foundation. "
+    ],
+    "copyrightLink": "CC BY-SA 4.0 licence",
+    "commonTermExamples": "Philosophy, History, and Society",
+    "subjectNote": "they are not Wikipedia categories"
+  },
+  "defaults": {
+    "minimumMentions": 5
+  },
+  "subjects": [
+    [
+      "Ethics",
+      "#b97559"
+    ],
+    [
+      "Politics & society",
+      "#a57290"
+    ],
+    [
+      "Mind & knowledge",
+      "#638f9e"
+    ],
+    [
+      "Logic & language",
+      "#7b75a6"
+    ],
+    [
+      "Science & mathematics",
+      "#6887b3"
+    ],
+    [
+      "Metaphysics",
+      "#b29854"
+    ],
+    [
+      "Religion",
+      "#8a8fb5"
+    ],
+    [
+      "Arts & aesthetics",
+      "#a48a6a"
+    ],
+    [
+      "History & traditions",
+      "#998678"
+    ],
+    [
+      "Other / interdisciplinary",
+      "#94a0ac"
+    ]
+  ]
+}

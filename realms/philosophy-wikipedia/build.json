@@ -1,0 +1,5 @@
+{
+  "source": "data/philosophy-wikipedia/articles.parquet",
+  "curation": "realms/philosophy-wikipedia",
+  "people": null
+}

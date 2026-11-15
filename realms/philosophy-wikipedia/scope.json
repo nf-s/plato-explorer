@@ -1,0 +1,63 @@
+{
+  "wikiProjects": [
+    "{importance}-importance Philosophy articles"
+  ],
+  "importance": [
+    "Top",
+    "High",
+    "Mid",
+    "Low"
+  ],
+  "wikidataSeeds": [
+    {
+      "name": "philosopher",
+      "pattern": "?item wdt:P106 wd:Q4964182",
+      "person": true
+    }
+  ],
+  "selection": {
+    "expandLinks": 10,
+    "incoming": 5,
+    "seedLinks": 3,
+    "neighbourLinks": 25,
+    "share": 0.2
+  },
+  "subjects": {
+    "Ethics": {
+      "terms": "ethic\\w*|moral\\w*|virtue\\w*|utilitarian\\w*|deontolog\\w*|consequentialis\\w*|good and evil|bioethic\\w*|duty|altruis\\w*|axiolog\\w*|normativ\\w*|happiness|hedonis\\w*|well-being|animal rights",
+      "seeds": []
+    },
+    "Politics & society": {
+      "terms": "politic\\w*|social|society|state|libert\\w*|liberal\\w*|marx\\w*|anarch\\w*|socialis\\w*|communis\\w*|feminis\\w*|democra\\w*|rights|law|legal|jurisprud\\w*|sovereign\\w*|conservati\\w*|critical theory|ideolog\\w*|justice|econom\\w*|activist|revolution\\w*",
+      "seeds": []
+    },
+    "Mind & knowledge": {
+      "terms": "epistem\\w*|knowledge|mind|conscious\\w*|percept\\w*|belief\\w*|skeptic\\w*|cognit\\w*|rational\\w*|empiric\\w*|justification|mental|intentionality|free will|self|qualia|psycholog\\w*|thought|reason|intuition\\w*",
+      "seeds": []
+    },
+    "Logic & language": {
+      "terms": "logic\\w*|language|linguist\\w*|semantic\\w*|paradox\\w*|fallac\\w*|argument\\w*|proposition\\w*|meaning|reference|syllogis\\w*|inference|modal|rhetoric|semiotic\\w*|truth|definition|hermeneutic\\w*",
+      "seeds": []
+    },
+    "Science & mathematics": {
+      "terms": "scien\\w*|mathemati\\w*|physic\\w*|quantum|biolog\\w*|evolution\\w*|probabilit\\w*|set theory|comput\\w*|experiment\\w*|technolog\\w*|artificial intelligence|cosmolog\\w*|astronom\\w*|medicine|natural philosophy|information",
+      "seeds": []
+    },
+    "Metaphysics": {
+      "terms": "metaphysic\\w*|ontolog\\w*|being|existence|substance|universals|time|space|identity|essence|reality|realism|nominalis\\w*|idealis\\w*|materialis\\w*|determinis\\w*|causa\\w*|possible world\\w*|monis\\w*|dualis\\w*|nothing|infinity",
+      "seeds": []
+    },
+    "Religion": {
+      "terms": "relig\\w*|god|theolog\\w*|theis\\w*|atheis\\w*|divin\\w*|faith|christian\\w*|islam\\w*|muslim|buddh\\w*|hindu\\w*|jewish|judai\\w*|scholastic\\w*|mystic\\w*|soul|church|catholic|priest|monk|rabbi|sufi\\w*|bishop|saint",
+      "seeds": []
+    },
+    "Arts & aesthetics": {
+      "terms": "aesthetic\\w*|art|arts|artist\\w*|beauty|literat\\w*|literary|music\\w*|film\\w*|poet\\w*|novel\\w*|taste|sublime|fiction|theatre|architecture|writer|essayist",
+      "seeds": []
+    },
+    "History & traditions": {
+      "terms": "ancient|medieval|renaissance|enlightenment|greek|roman|chinese|indian|japanese|stoic\\w*|platon\\w*|aristotel\\w*|kant\\w*|hegel\\w*|confucian\\w*|tao\\w*|existential\\w*|phenomenolog\\w*|pragmatis\\w*|analytic|continental|neoplatonis\\w*|vedanta|presocratic|pre-socratic|epicurean\\w*|cynic\\w*|sophist\\w*|peripatetic|history of philosophy|school of",
+      "seeds": []
+    }
+  }
+}

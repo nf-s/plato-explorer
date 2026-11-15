@@ -20,6 +20,7 @@ import {
   chosenRealm,
   dataPath,
   linkedRealms,
+  realmLabel,
   realmHref,
   validateLinks,
   validateRealm,
@@ -401,9 +402,10 @@ function renderSelection() {
     const actions = element("div", "realm-links");
     actions.append(element("span", "realm-links-label", "Open in"));
     for (const other of others) {
-      const link = element("a", "secondary-button", other.realm.name);
+      const label = realmLabel(realms, other.realm);
+      const link = element("a", "secondary-button", label);
       link.href = other.href;
-      link.setAttribute("aria-label", `Open in ${other.realm.name}`);
+      link.setAttribute("aria-label", `Open in ${label}`);
       actions.append(link);
     }
     fragment.append(actions);

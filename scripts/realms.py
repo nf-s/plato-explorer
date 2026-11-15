@@ -1,6 +1,7 @@
 """Locate each realm's source snapshot, curation files and generated data."""
 
 import json
+import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REALMS = ROOT / "realms"
 DATA = ROOT / "web/data"
+BUCKET_NAME = re.compile(r"[a-z0-9][a-z0-9-]{1,61}[a-z0-9]")
 
 
 @dataclass(frozen=True)
@@ -28,10 +30,12 @@ class Realm:
 
 
 def app_settings():
-    """The Pages project and the realms the app offers, in menu order. The first is the default."""
+    """The Pages project, the bucket that holds released articles and the realms in menu order. The first realm is the default."""
     settings = json.loads((REALMS / "app.json").read_text())
-    if not isinstance(settings, dict) or set(settings) != {"pagesProject", "realms"} or not isinstance(settings["pagesProject"], str):
+    if not isinstance(settings, dict) or set(settings) != {"pagesProject", "articlesBucket", "realms"} or not isinstance(settings["pagesProject"], str):
         raise ValueError("Invalid app settings")
+    if not isinstance(settings["articlesBucket"], str) or not BUCKET_NAME.fullmatch(settings["articlesBucket"]):
+        raise ValueError("Invalid articles bucket")
     names = settings["realms"]
     if not isinstance(names, list) or not names or len(set(names)) != len(names) or not all(isinstance(name, str) and (REALMS / name / "build.json").is_file() for name in names):
         raise ValueError("Invalid realm list")
@@ -75,20 +79,17 @@ def write_realm_files(realm, output):
         links.write_text("{}\n")
 
 
-def realm_index(addresses=None, data=DATA):
-    """List the built realms for the app's realm menu, with the address of each realm's data.
-
-    Without addresses the data is beside the app, as in a local build."""
+def realm_index(data=DATA):
+    """List the built realms for the app's realm menu."""
     entries = []
     for realm in built_realms(data):
         settings = json.loads(realm.config.read_text())
-        address = addresses[realm.name] if addresses else f"./data/{realm.name}/"
-        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"], "data": address})
+        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"]})
     return {"realms": entries}
 
 
 def write_realm_index(data=DATA):
-    index = realm_index(data=data)
+    index = realm_index(data)
     (data / "realms.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n")
     return index["realms"]
 
