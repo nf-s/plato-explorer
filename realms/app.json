@@ -1,6 +1,8 @@
 {
   "pagesProject": "plato-network",
+  "publicUrl": "https://plato-network.pages.dev",
   "articlesBucket": "plato-network-articles",
+  "accessDatabase": "plato-network-access",
   "realms": [
     "philosophy",
     "philosophy-wikipedia",
@@ -10,5 +12,6 @@
     "religion",
     "mythology",
     "art"
-  ]
+  ],
+  "restrictedRealms": ["philosophy"]
 }

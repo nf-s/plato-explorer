@@ -19,7 +19,8 @@ function httpsUrl(value) {
 
 const REALM_ID = /^[a-z][a-z0-9-]*$/;
 
-// The realm menu lists every built realm; the first is the default.
+// The realm menu lists the realms this viewer can open; the first is the
+// default. A release marks the realms that need a signed-in account.
 export function validateRealms(data) {
   if (
     !record(data) ||
@@ -32,17 +33,22 @@ export function validateRealms(data) {
         REALM_ID.test(entry.id) &&
         ["name", "source", "sourceShortName"].every((field) =>
           text(entry[field]),
-        ),
+        ) &&
+        (entry.restricted === undefined ||
+          typeof entry.restricted === "boolean"),
     ) ||
     new Set(data.realms.map((entry) => entry.id)).size !== data.realms.length
   )
     throw new Error("The realm list has an unsupported format.");
-  return data.realms.map(({ id, name, source, sourceShortName }) => ({
-    id,
-    name,
-    source,
-    sourceShortName,
-  }));
+  return data.realms.map(
+    ({ id, name, source, sourceShortName, restricted }) => ({
+      id,
+      name,
+      source,
+      sourceShortName,
+      restricted: restricted === true,
+    }),
+  );
 }
 
 // Addresses without a known realm, including those shared before realms
@@ -52,10 +58,21 @@ export function chosenRealm(realms, search) {
   return realms.find((realm) => realm.id === requested) ?? realms[0];
 }
 
-export function realmHref(realms, id, nodeId = null) {
-  const query = id === realms[0].id ? "" : `?realm=${encodeURIComponent(id)}`;
+// The default realm depends on who is looking, so every address the app
+// writes names its realm.
+export function realmHref(id, nodeId = null) {
   const hash = nodeId === null ? "" : `#/${encodeURIComponent(nodeId)}`;
-  return `./${query}${hash}`;
+  return `./?realm=${encodeURIComponent(id)}${hash}`;
+}
+
+// An address that names no realm gets the one it opened, so a copied address
+// opens the same realm for a viewer with a different default. An address that
+// names a realm this viewer cannot open is kept, for signing in.
+export function addressWithRealm(search, id) {
+  const parameters = new URLSearchParams(search);
+  if (parameters.has("realm")) return null;
+  parameters.set("realm", id);
+  return `?${parameters}`;
 }
 
 // Two realms can cover one field from different sources. A name that another
@@ -134,13 +151,28 @@ export function validateLinks(data, ids, realms) {
   return linked;
 }
 
+// A released public realm leaves out its links to restricted realms. The
+// restricted realm lists the same pairs from its side, as {its node: local
+// node}, which this turns round.
+export function reversedLinks(data, id) {
+  if (!record(data) || !Object.values(data).every(record))
+    throw new Error("The realm links have an unsupported format.");
+  const reversed = Object.create(null);
+  for (const [target, local] of Object.entries(data[id] ?? {})) {
+    if (typeof local !== "string")
+      throw new Error("The realm links contain an invalid node.");
+    reversed[local] = target;
+  }
+  return reversed;
+}
+
 // The same subject in other realms, as [{realm, href}].
-export function linkedRealms(linked, realms, id) {
+export function linkedRealms(linked, id) {
   return linked.flatMap(({ realm, links }) => {
     const target = links.get(id);
     return target === undefined
       ? []
-      : [{ realm, href: realmHref(realms, realm.id, target) }];
+      : [{ realm, href: realmHref(realm.id, target) }];
   });
 }
 

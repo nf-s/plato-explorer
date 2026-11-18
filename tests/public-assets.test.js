@@ -58,11 +58,14 @@ async function built(t) {
   }
 }
 
-test("app staging contains the app and each realm's data without articles, reports, account assets or deployment sources", async (t) => {
+test("app staging contains the app and each public realm's data without articles, reports, restricted realms or deployment sources", async (t) => {
   if (!(await built(t))) return;
   prepare();
   const staged = new URL(".artifacts/public/", root);
   const names = await readdir(staged, { recursive: true });
+  const app = JSON.parse(
+    await readFile(new URL("realms/app.json", root), "utf8"),
+  );
   for (const path of [
     "index.html",
     "app.js",
@@ -78,6 +81,7 @@ test("app staging contains the app and each realm's data without articles, repor
     "_worker.js",
     "_routes.json",
     "realm.js",
+    "account.js",
     "data/realms.json",
   ])
     assert.ok(names.includes(path), `Missing public asset: ${path}`);
@@ -85,19 +89,34 @@ test("app staging contains the app and each realm's data without articles, repor
   assert.ok(
     names.every(
       (name) =>
-        !/(?:^|\/)(?:\.|worker|functions|login|account|wrangler|articles|build-report|keyword-report|word-freq)/u.test(
+        !/(?:^|\/)(?:\.|worker|functions|login|wrangler|articles|build-report|keyword-report|word-freq)/u.test(
           name,
         ),
     ),
   );
   const html = await readFile(new URL("index.html", staged), "utf8");
   assert.doesNotMatch(html, /cloudflareinsights|data-cf-beacon/u);
-  assert.doesNotMatch(html, /(?:login|account)\.(?:js|css)/u);
-  const app = await readFile(new URL("app.js", staged), "utf8");
-  assert.doesNotMatch(app, /initAccount|\/api\/session|\/auth\/google/u);
+  assert.doesNotMatch(html, /login\.(?:js|css)/u);
   const realms = validateRealms(
     JSON.parse(await readFile(new URL("data/realms.json", staged), "utf8")),
   );
+  // A restricted realm is absent from the assets: no files, no menu entry and
+  // no links to it from the public realms.
+  assert.ok(app.restrictedRealms.length > 0);
+  assert.deepEqual(
+    realms.map((realm) => realm.id),
+    app.realms.filter((id) => !app.restrictedRealms.includes(id)),
+  );
+  for (const id of app.restrictedRealms) {
+    assert.ok(names.every((name) => !name.startsWith(`data/${id}/`)));
+    for (const realm of realms) {
+      const links = JSON.parse(
+        await readFile(new URL(`data/${realm.id}/links.json`, staged), "utf8"),
+      );
+      assert.ok(!Object.hasOwn(links, id), `${realm.id} links to ${id}`);
+    }
+  }
+  assert.ok(realms.every((realm) => !realm.restricted));
   for (const realm of realms)
     for (const path of [
       "realm.json",
@@ -109,14 +128,24 @@ test("app staging contains the app and each realm's data without articles, repor
         names.includes(`data/${realm.id}/${path}`),
         `Missing ${realm.id} asset: ${path}`,
       );
-  // Articles are served from object storage, and only their requests may
-  // invoke the Function.
+  // Only sign-in, a public realm's articles and everything in a restricted
+  // realm may invoke the Function.
   const routes = JSON.parse(
     await readFile(new URL("_routes.json", staged), "utf8"),
   );
   assert.deepEqual(routes, {
     version: 1,
-    include: realms.map((realm) => `/data/${realm.id}/articles/*`),
+    include: [
+      "/api/*",
+      "/auth/*",
+      ...realms.map((realm) => `/data/${realm.id}/articles/*`),
+      ...app.restrictedRealms.map((id) => `/data/${id}/*`),
+    ],
     exclude: [],
   });
+  // The Function's sign-in service is staged beside the release, where its
+  // import resolves, and is not uploaded as an asset.
+  const worker = await readFile(new URL("_worker.js", staged), "utf8");
+  for (const [, path] of worker.matchAll(/from "(\.\.\/[^"]+)"/gu))
+    await access(new URL(path, new URL("_worker.js", staged)));
 });

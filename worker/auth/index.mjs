@@ -104,6 +104,10 @@ function errorResponse(error) {
   );
 }
 
+function loginPageUrl(code) {
+  return `/login?error=${encodeURIComponent(code)}`;
+}
+
 function parameter(url, name, required = true) {
   const values = url.searchParams.getAll(name);
   if (
@@ -115,7 +119,11 @@ function parameter(url, name, required = true) {
   return values[0];
 }
 
-/** Public auth routes only. The caller must gate every other corpus route. */
+/**
+ * Public auth routes only. The caller must gate every other corpus route.
+ * `dependencies.signInFailureUrl` maps a failure code to the page a failed
+ * sign-in returns to.
+ */
 export async function handleAuthRequest(request, env, dependencies = {}) {
   const url = new URL(request.url);
   const methods = ROUTES.get(url.pathname);
@@ -269,7 +277,7 @@ export async function handleAuthRequest(request, env, dependencies = {}) {
           ? failure.code
           : "authentication_unavailable";
       const result = response(null, 303, {
-        Location: `/login?error=${encodeURIComponent(code)}`,
+        Location: (dependencies.signInFailureUrl ?? loginPageUrl)(code),
       });
       result.headers.append("Set-Cookie", cookie(COOKIE_NAMES.login, "", 0));
       result.headers.append("Set-Cookie", enrollmentCookie);

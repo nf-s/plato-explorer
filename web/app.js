@@ -16,16 +16,24 @@ import { ArticleReader } from "./reader.js";
 import { ConnectionEvidence } from "./evidence.js";
 import { category, nodeColor, palette, setSubjects } from "./categories.js";
 import {
+  addressWithRealm,
   applyRealm,
   chosenRealm,
   dataPath,
   linkedRealms,
   realmLabel,
   realmHref,
+  reversedLinks,
   validateLinks,
   validateRealm,
   validateRealms,
 } from "./realm.js";
+import {
+  initAccount,
+  loadSession,
+  signInFailure,
+  withoutSignInFailure,
+} from "./account.js";
 import { FullTextSearch } from "./full-text-search.js";
 import {
   NavigationHistory,
@@ -397,7 +405,7 @@ function renderSelection() {
       ),
     );
   }
-  const others = linkedRealms(linked, realms, node.id);
+  const others = linkedRealms(linked, node.id);
   if (others.length) {
     const actions = element("div", "realm-links");
     actions.append(element("span", "realm-links-label", "Open in"));
@@ -1023,7 +1031,7 @@ function renderRealmPicker(chosen) {
   get("realm-menu").replaceChildren(
     ...realms.map((entry) => {
       const link = element("a", "realm-option");
-      link.href = realmHref(realms, entry.id);
+      link.href = realmHref(entry.id);
       if (entry.id === chosen.id) link.setAttribute("aria-current", "page");
       link.append(
         element("strong", "", entry.name),
@@ -1045,16 +1053,55 @@ function renderRealmPicker(chosen) {
   });
 }
 
+// A signed-in account's menu also lists the realms that need one.
+async function loadRealms(session, missing) {
+  if (session.kind === "signed-in") {
+    const response = await fetch("/api/realms", {
+      headers: { Accept: "application/json" },
+    });
+    if (response.ok) return validateRealms(await response.json());
+  }
+  const response = await fetch("./data/realms.json");
+  if (!response.ok) throw new Error(missing);
+  return validateRealms(await response.json());
+}
+
+// A released public realm leaves out its links to restricted realms, which
+// list the same pairs themselves.
+async function withRestrictedLinks(links, chosen) {
+  if (chosen.restricted) return links;
+  for (const other of realms.filter((entry) => entry.restricted)) {
+    const response = await fetch(`${dataPath(other)}links.json`);
+    if (response.ok)
+      links[other.id] = reversedLinks(await response.json(), chosen.id);
+  }
+  return links;
+}
+
 async function start() {
   try {
     const missing =
       "The graph data is missing. Run the data build command below, then reload.";
-    const realmsResponse = await fetch("./data/realms.json");
-    if (!realmsResponse.ok) throw new Error(missing);
-    realms = validateRealms(await realmsResponse.json());
+    const failed = signInFailure(location.search);
+    if (failed)
+      history.replaceState(
+        history.state,
+        "",
+        `${location.pathname}${withoutSignInFailure(location.search)}${location.hash}`,
+      );
+    const session = await loadSession(location, document.cookie, fetch);
+    realms = await loadRealms(session, missing);
     const chosen = chosenRealm(realms, location.search);
+    const named = addressWithRealm(location.search, chosen.id);
+    if (named !== null)
+      history.replaceState(
+        history.state,
+        "",
+        `${location.pathname}${named}${location.hash}`,
+      );
     const data = dataPath(chosen);
     renderRealmPicker(chosen);
+    await initAccount(session, failed);
     const [realmResponse, response, linksResponse] = await Promise.all([
       fetch(`${data}realm.json`),
       fetch(`${data}graph.json`),
@@ -1069,7 +1116,7 @@ async function start() {
     filters.minimum = realm.defaults.minimumMentions;
     sourceGraph = validateGraph(await response.json());
     linked = validateLinks(
-      await linksResponse.json(),
+      await withRestrictedLinks(await linksResponse.json(), chosen),
       new Set(sourceGraph.nodes.map((node) => node.id)),
       realms.filter((entry) => entry.id !== chosen.id),
     );

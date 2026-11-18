@@ -1,6 +1,8 @@
 # Previous private Cloudflare Worker deployment
 
-The current app uses Cloudflare Pages. This guide describes the earlier Google-protected Worker, which has its own access database. The current public frontend omits the account and login controls. Reinstating the private experience requires restoring those controls as well as the asset gate. [Public release guide](public-deployment.md)
+The current app uses Cloudflare Pages. It is public, and shows the SEP realm only to approved Google accounts through its own Function and access database. [Public release guide](public-deployment.md)
+
+This guide describes the earlier Worker, which put the whole app behind Google sign-in and has a separate access database. Both use the sign-in service in `worker/auth/`. The Worker's login page is `web/login.html`; the shared frontend's account control is written for the Pages app.
 
 ## Configuration
 

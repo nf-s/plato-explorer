@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REALMS = ROOT / "realms"
 DATA = ROOT / "web/data"
 BUCKET_NAME = re.compile(r"[a-z0-9][a-z0-9-]{1,61}[a-z0-9]")
+ORIGIN = re.compile(r"https://[a-z0-9.-]+")
 
 
 @dataclass(frozen=True)
@@ -30,20 +31,34 @@ class Realm:
 
 
 def app_settings():
-    """The Pages project, the bucket that holds released articles and the realms in menu order. The first realm is the default."""
+    """The Pages project and its address, the bucket that holds released files, the database of approved accounts,
+    the realms in menu order and the realms a release shows only to those accounts. The first realm is the default."""
     settings = json.loads((REALMS / "app.json").read_text())
-    if not isinstance(settings, dict) or set(settings) != {"pagesProject", "articlesBucket", "realms"} or not isinstance(settings["pagesProject"], str):
+    if not isinstance(settings, dict) or set(settings) != {"pagesProject", "publicUrl", "articlesBucket", "accessDatabase", "realms", "restrictedRealms"}:
         raise ValueError("Invalid app settings")
+    if not isinstance(settings["pagesProject"], str) or not isinstance(settings["accessDatabase"], str) or not settings["accessDatabase"]:
+        raise ValueError("Invalid app settings")
+    if not isinstance(settings["publicUrl"], str) or not ORIGIN.fullmatch(settings["publicUrl"]):
+        raise ValueError("Invalid public address")
     if not isinstance(settings["articlesBucket"], str) or not BUCKET_NAME.fullmatch(settings["articlesBucket"]):
         raise ValueError("Invalid articles bucket")
     names = settings["realms"]
     if not isinstance(names, list) or not names or len(set(names)) != len(names) or not all(isinstance(name, str) and (REALMS / name / "build.json").is_file() for name in names):
         raise ValueError("Invalid realm list")
+    restricted = settings["restrictedRealms"]
+    if not isinstance(restricted, list) or len(set(restricted)) != len(restricted) or not set(restricted) <= set(names):
+        raise ValueError("Invalid restricted realm list")
+    if set(restricted) == set(names):
+        raise ValueError("A release needs at least one public realm")
     return settings
 
 
 def realm_names():
     return app_settings()["realms"]
+
+
+def restricted_names():
+    return app_settings()["restrictedRealms"]
 
 
 def load_realm(name):
@@ -79,12 +94,15 @@ def write_realm_files(realm, output):
         links.write_text("{}\n")
 
 
-def realm_index(data=DATA):
-    """List the built realms for the app's realm menu."""
+def realm_index(data=DATA, restricted=()):
+    """List the built realms for the app's realm menu. A release marks the realms that need a signed-in account."""
     entries = []
     for realm in built_realms(data):
         settings = json.loads(realm.config.read_text())
-        entries.append({"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"]})
+        entry = {"id": realm.name, "name": settings["name"], "source": settings["source"]["name"], "sourceShortName": settings["source"]["shortName"]}
+        if realm.name in restricted:
+            entry["restricted"] = True
+        entries.append(entry)
     return {"realms": entries}
 
 

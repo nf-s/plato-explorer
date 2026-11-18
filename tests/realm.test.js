@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  addressWithRealm,
   chosenRealm,
   dataPath,
   linkedRealms,
   realmHref,
   realmLabel,
+  reversedLinks,
   validateLinks,
   validateRealm,
   validateRealms,
@@ -84,14 +86,64 @@ test("the address chooses a realm and earlier addresses open the default", () =>
   assert.equal(chosenRealm(realms, "").id, "philosophy");
   assert.equal(chosenRealm(realms, "?realm=psychology").id, "psychology");
   assert.equal(chosenRealm(realms, "?realm=astrology").id, "philosophy");
-  assert.equal(realmHref(realms, "philosophy"), "./");
-  assert.equal(realmHref(realms, "psychology"), "./?realm=psychology");
-  assert.equal(realmHref(realms, "philosophy", "love"), "./#/love");
+  assert.equal(dataPath(realms[1]), "./data/psychology/");
+});
+
+test("every address the app writes names its realm, because the default depends on the viewer", () => {
+  assert.equal(realmHref("philosophy"), "./?realm=philosophy");
   assert.equal(
-    realmHref(realms, "psychology", "music-psychology"),
+    realmHref("psychology", "music-psychology"),
     "./?realm=psychology#/music-psychology",
   );
-  assert.equal(dataPath(realms[1]), "./data/psychology/");
+  assert.equal(addressWithRealm("", "psychology"), "?realm=psychology");
+  assert.equal(addressWithRealm("?a=1", "psychology"), "?a=1&realm=psychology");
+  // A named realm is kept, including one this viewer cannot open until signing in.
+  assert.equal(addressWithRealm("?realm=philosophy", "psychology"), null);
+});
+
+test("the realm list marks the realms that need a signed-in account", () => {
+  const entry = {
+    id: "philosophy",
+    name: "Philosophy",
+    source: "SEP",
+    sourceShortName: "SEP",
+  };
+  const realms = validateRealms({
+    realms: [
+      { ...entry, restricted: true },
+      { ...entry, id: "psychology" },
+    ],
+  });
+  assert.deepEqual(
+    realms.map((realm) => realm.restricted),
+    [true, false],
+  );
+  assert.throws(
+    () => validateRealms({ realms: [{ ...entry, restricted: "yes" }] }),
+    /unsupported format/u,
+  );
+});
+
+test("a restricted realm's links are turned round for the public realm they point at", () => {
+  const realms = realmList();
+  const restricted = {
+    psychology: { love: "love", "music-keyword": "music-psychology" },
+    economics: { love: "love-economics" },
+  };
+  const linked = validateLinks(
+    { philosophy: reversedLinks(restricted, "psychology") },
+    new Set(["love", "music-psychology"]),
+    realms.slice(0, 1),
+  );
+  assert.deepEqual(linkedRealms(linked, "music-psychology"), [
+    { realm: realms[0], href: "./?realm=philosophy#/music-keyword" },
+  ]);
+  assert.deepEqual(Object.keys(reversedLinks(restricted, "society")), []);
+  assert.throws(() => reversedLinks([], "psychology"), /unsupported format/u);
+  assert.throws(
+    () => reversedLinks({ psychology: { love: 1 } }, "psychology"),
+    /invalid node/u,
+  );
 });
 
 test("the realm list rejects empty, duplicate and unsafe entries", () => {
@@ -128,10 +180,10 @@ test("links to other realms open the matching node and ignore unknown nodes and 
   );
   assert.equal(linked.length, 1);
   assert.equal(linked[0].links.size, 2);
-  assert.deepEqual(linkedRealms(linked, realms, "keyword-music"), [
+  assert.deepEqual(linkedRealms(linked, "keyword-music"), [
     { realm: realms[1], href: "./?realm=psychology#/music-psychology" },
   ]);
-  assert.deepEqual(linkedRealms(linked, realms, "gone"), []);
+  assert.deepEqual(linkedRealms(linked, "gone"), []);
   assert.deepEqual(validateLinks({}, new Set(["love"]), realms.slice(1)), []);
   assert.throws(
     () => validateLinks({ psychology: [] }, new Set(), realms.slice(1)),

@@ -1595,6 +1595,23 @@ mark {
 .account-status {
   margin-top: 15px !important;
 }
+.account-status:empty {
+  display: none;
+}
+.enrollment-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0 0 15px;
+  font-size: 12px;
+}
+.enrollment-details dt {
+  color: var(--muted);
+}
+.enrollment-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 1100px) {
   .graph-toolbar {
     left: 18px;
