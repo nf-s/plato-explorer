@@ -1,6 +1,6 @@
 # Copyright and use of encyclopedia material
 
-The [MIT License](LICENSE) applies to Plato Explorer's original code and accompanying documentation. The license grants no rights to the SEP corpus or other third-party material.
+Plato Explorer's original code and accompanying documentation are dedicated to the public domain under [CC0 1.0](LICENSE), without warranty. The dedication grants no rights to the SEP corpus or other third-party material.
 
 **This repository excludes the Stanford Encyclopedia of Philosophy corpus.** It contains the application, build scripts, matching rules, tests and screenshots of the explorer interface. The README screenshots come from the Wikipedia realms and show a few lines of Wikipedia articles, which are credited there. Source datasets, full entries, generated graph files, the search index and build reports are excluded from Git.
 

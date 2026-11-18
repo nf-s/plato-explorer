@@ -70,6 +70,10 @@ Open `http://127.0.0.1:5173` in your browser.
 
 The Wikipedia realms need a 35 GB Wikipedia snapshot. [Wikipedia sources and build steps](docs/wikipedia-realms.md)
 
+## Made with AI
+
+The explorer code, matching rules and documentation were generated almost entirely by AI coding agents, directed by the author. Mentions are matched automatically and subjects are estimated, so connections can be wrong or missing.
+
 ## Copyright
 
-The MIT license covers the explorer code. The repository contains no SEP articles, Wikipedia articles or generated corpus files. Wikipedia text is available under CC BY-SA 4.0. SEP entry authors generally retain copyright in their articles. Plato Explorer has no affiliation with Stanford University, the SEP or the Wikimedia Foundation. [MIT license](LICENSE) · [Copyright notice](COPYRIGHT.md)
+The explorer code and documentation are dedicated to the public domain under CC0 1.0, without warranty. The repository contains no SEP articles, Wikipedia articles or generated corpus files. Wikipedia text is available under CC BY-SA 4.0. SEP entry authors generally retain copyright in their articles. Plato Explorer has no affiliation with Stanford University, the SEP or the Wikimedia Foundation. [CC0 1.0](LICENSE) · [Copyright notice](COPYRIGHT.md)

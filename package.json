@@ -1,7 +1,7 @@
 {
   "name": "plato-explorer",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "CC0-1.0",
   "private": true,
   "type": "module",
   "scripts": {
