@@ -1,22 +1,60 @@
-# Plato Explorer
+<h1 align="center">Plato Explorer</h1>
 
-Explore how articles in the Stanford Encyclopedia of Philosophy mention people and ideas. Larger nodes receive more mentions. Thicker lines mean more mentions between a pair. You can also search the full text and read articles in the explorer.
+<p align="center">
+  Explore how encyclopedia articles mention people and ideas.<br />
+  Each realm is a network you can search and read.
+</p>
 
-![The home screen with the encyclopedia network and no node selected](docs/screenshots/home.png)
+<p align="center">
+  <a href="https://plato-network.pages.dev/">
+    <img src="docs/open-explorer.svg" alt="Open Plato Explorer at plato-network.pages.dev" width="440" />
+  </a>
+</p>
 
-Select **Love** to see its 164 neighbours under the default filters. The sidebar shows mentions in both directions and identifies articles the SEP lists as related entries.
+<p align="center">
+  <a href="https://plato-network.pages.dev/?realm=art">
+    <img src="docs/screenshots/art.png" alt="The Art realm as a network of 9,898 nodes, with the most mentioned articles listed in the sidebar" />
+  </a>
+</p>
 
-![Love selected on a laptop, with default filters and the article details sidebar open](docs/screenshots/love.png)
+## Realms
 
-Select **Music** and find **Confucius** in the sidebar. Choose **Mentions** to see the 18 passages where the Confucius entry mentions music. Selecting a passage takes you to that sentence in the article.
+| Realm                                                                     | Source                              |
+| ------------------------------------------------------------------------- | ----------------------------------- |
+| [Philosophy](https://plato-network.pages.dev/?realm=philosophy)           | Stanford Encyclopedia of Philosophy |
+| [Philosophy](https://plato-network.pages.dev/?realm=philosophy-wikipedia) | Wikipedia                           |
+| [Psychology](https://plato-network.pages.dev/?realm=psychology)           | Wikipedia                           |
+| [Economics](https://plato-network.pages.dev/?realm=economics)             | Wikipedia                           |
+| [Society](https://plato-network.pages.dev/?realm=society)                 | Wikipedia                           |
+| [Religion](https://plato-network.pages.dev/?realm=religion)               | Wikipedia                           |
+| [Mythology](https://plato-network.pages.dev/?realm=mythology)             | Wikipedia                           |
+| [Art](https://plato-network.pages.dev/?realm=art)                         | Wikipedia                           |
 
-![The Music network with the Confucius Mentions sidebar open, showing article passages and highlighting the matched words](docs/screenshots/music.png)
+A node found in several realms links to the others. [Realms](docs/realms.md)
 
-The brief excerpts in these screenshots are from the _Stanford Encyclopedia of Philosophy_. [“Love” by Bennett Helm](https://plato.stanford.edu/entries/love/) · [“Confucius” by Mark Csikszentmihalyi](https://plato.stanford.edu/entries/confucius/)
+## Select a node
+
+Larger nodes receive more mentions. Thicker lines mean more mentions between a pair. The sidebar lists a node's connections with the mentions in each direction.
+
+![Zeus selected in the Mythology realm, with its connected nodes listed in the sidebar](docs/screenshots/zeus.png)
+
+## Read the mentions
+
+Choose **Mentions** beside a connected node to see the passages behind the connection. Selecting a passage opens the article at that sentence.
+
+![The Carl Jung network in the Psychology realm, with the passages where the Carl Jung article mentions Sigmund Freud](docs/screenshots/jung-freud.png)
+
+## Search the full text
+
+Search covers node names and the text of every article in the realm.
+
+![A search for “moral panic” in the Society realm, showing matching nodes and article passages](docs/screenshots/search.png)
+
+The brief excerpts in these screenshots are from English Wikipedia, by Wikipedia contributors, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). [Zeus](https://en.wikipedia.org/wiki/Zeus) · [Carl Jung](https://en.wikipedia.org/wiki/Carl_Jung) · [Moral panic](https://en.wikipedia.org/wiki/Moral_panic) · [Elite panic](https://en.wikipedia.org/wiki/Elite_panic) · [Satanic panic](https://en.wikipedia.org/wiki/Satanic_panic)
 
 ## Run locally
 
-From a clone of this repository, use Python 3.12 or newer. The download is about 271 MB. One snapshot supplies the articles and their related entries. The other supplies author credits. [Article dataset](https://huggingface.co/datasets/hugfaceguy0001/stanford_plato) · [Author credit dataset](https://huggingface.co/datasets/dmarx/stanford-encyclopedia-of-philosophy_dec23)
+Use Python 3.12 or newer. These commands download about 271 MB and build the SEP Philosophy realm.
 
 ```sh
 python3 -m venv .venv
@@ -30,17 +68,8 @@ python scripts/serve.py
 
 Open `http://127.0.0.1:5173` in your browser.
 
-## Realms
-
-The explorer shows one realm at a time. Philosophy is offered twice, from the SEP and from English Wikipedia. Psychology, Economics, Society, Religion, Mythology and Art come from Wikipedia. Each Wikipedia realm holds 7,000 to 10,000 articles, and their builds need a 35 GB Wikipedia snapshot. A node found in several realms links to the others. [Realms](docs/realms.md) · [Wikipedia sources and build steps](docs/wikipedia-realms.md)
-
-```sh
-python scripts/build_wikipedia_realm.py --realm psychology
-python scripts/build_data.py --realm psychology
-python scripts/build_search.py --realm psychology
-python scripts/build_realm_links.py
-```
+The Wikipedia realms need a 35 GB Wikipedia snapshot. [Wikipedia sources and build steps](docs/wikipedia-realms.md)
 
 ## Copyright
 
-The repository contains no SEP articles, Wikipedia articles or generated corpus files. SEP entry authors generally retain copyright in their articles. The Metaphysics Research Lab at Stanford University holds copyright in the encyclopedia. Wikipedia text is available under CC BY-SA 4.0. The MIT license covers the explorer code. [MIT license](LICENSE) · [Copyright notice](COPYRIGHT.md) · [SEP terms of use](https://plato.stanford.edu/info.html#terms)
+The MIT license covers the explorer code. The repository contains no SEP articles, Wikipedia articles or generated corpus files. Wikipedia text is available under CC BY-SA 4.0. SEP entry authors generally retain copyright in their articles. Plato Explorer has no affiliation with Stanford University, the SEP or the Wikimedia Foundation. [MIT license](LICENSE) · [Copyright notice](COPYRIGHT.md)
