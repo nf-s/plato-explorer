@@ -26,3 +26,6 @@ __pycache__/
 /wrangler.jsonc
 client_secret*.json
 .DS_Store
+
+# Local-only notes.
+/private-ops/

@@ -49,7 +49,7 @@ COMPATIBILITY_DATE = "2026-01-01"
 # The Function imports the sign-in service from this folder, which is staged beside the release
 # and bundled into the Function by Wrangler. Its files are never uploaded as assets.
 ACCESS_SOURCE = Path("worker/auth")
-# The full realm list, for a signed-in viewer's realm menu.
+# The full realm list, stored beside the restricted realms' files.
 REALM_LIST_KEY = "realms.json"
 # Wrangler uploads objects through the Cloudflare API, which accepts 1,200
 # requests in five minutes. Each attempt at a batch stays under that, and a
@@ -84,7 +84,7 @@ def function_routes(public, restricted):
 
 
 def split_realms(realms):
-    """Separate the realms anyone can open from those a release shows only to approved accounts."""
+    """Separate the public realms from those a release keeps out of the public files."""
     names = restricted_names()
     return [realm for realm in realms if realm.name not in names], [realm for realm in realms if realm.name in names]
 
@@ -229,7 +229,7 @@ def check_uploaded(bucket, realms):
 
 
 def upload_realm_list(command, bucket, working_directory):
-    """Store the full realm list, which the Function gives to signed-in accounts."""
+    """Store the full realm list beside the restricted realms' files."""
     listing = working_directory / REALM_LIST_KEY
     listing.write_text(json.dumps(realm_index(restricted=restricted_names()), ensure_ascii=False, indent=2) + "\n")
     pairs = working_directory / "realm-list.json"

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-These instructions apply to work in Plato Explorer. Start with the [project handoff](docs/handoff.md) for decisions and the [README](README.md) for commands. The production target is the public Cloudflare Pages project `plato-network`. Its release procedure is in [public deployment](docs/public-deployment.md). The app shows one realm at a time: Philosophy from the SEP, and Philosophy, Psychology, Economics, Society, Religion, Mythology and Art from Wikipedia. A release shows the SEP realm only to Google accounts the administrator has approved, and keeps it out of the public files. [Restricted realms](docs/realms.md#restricted-realms) Realm settings live under `realms/`, and changes to `web/` affect every realm. [Realms](docs/realms.md)
+These instructions apply to work in Plato Explorer. Start with the [project handoff](docs/handoff.md) for decisions and the [README](README.md) for commands. The production target is the public Cloudflare Pages project `plato-network`. Its release procedure is in [public deployment](docs/public-deployment.md). The app shows one realm at a time: Philosophy from the SEP, and Philosophy, Psychology, Economics, Society, Religion, Mythology and Art from Wikipedia. A release leaves the SEP realm out of the public files, and the published app has the Wikipedia realms only. [Restricted realms](docs/realms.md#restricted-realms) Notes that are not for publication are kept in the ignored `private-ops/` folder. When it exists, read `private-ops/README.md` before working on releases, the Function, the README or these docs, and keep what it says out of tracked files and commit messages. Realm settings live under `realms/`, and changes to `web/` affect every realm. [Realms](docs/realms.md)
 
 ## Hosting and source publication — apply across projects
 
@@ -8,7 +8,7 @@ These instructions apply to work in Plato Explorer. Start with the [project hand
 - Deploy only when the user explicitly requests deployment and specifies or agrees to the destination.
 - For Plato Explorer, publish source to GitHub. Keep downloaded SEP and Wikipedia materials, generated corpus files, article screenshots, build reports, browser snapshots and deployment credentials out of Git and releases. Show the app and sidebar in README screenshots. Take them from the Wikipedia realms and keep SEP material out of them. README screenshots may show a brief, readable excerpt to illustrate a feature. Credit the articles beside the screenshots. See the [copyright notice](COPYRIGHT.md).
 
-Keep the README short and focused on the explorer, screenshots, local setup and copyright. Give it a large link to the deployed app near the top. In the README and the copyright notice, describe the published app as the Wikipedia realms and give the reason the SEP realm is not published. Leave sign-in and approved accounts out of both. Keep handoff and release notes in `docs/`.
+Keep the README short and focused on the explorer, screenshots, local setup and copyright. Give it a large link to the deployed app near the top. Describe the published app as the Wikipedia realms and give the reason the SEP realm is not published. Keep handoff and release notes in `docs/`.
 
 ## Interface styling preferences — apply across projects
 

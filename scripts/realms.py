@@ -31,8 +31,8 @@ class Realm:
 
 
 def app_settings():
-    """The Pages project and its address, the bucket that holds released files, the database of approved accounts,
-    the realms in menu order and the realms a release shows only to those accounts. The first realm is the default."""
+    """The Pages project and its address, the bucket that holds released files, the access database,
+    the realms in menu order and the realms a release keeps out of the public files. The first realm is the default."""
     settings = json.loads((REALMS / "app.json").read_text())
     if not isinstance(settings, dict) or set(settings) != {"pagesProject", "publicUrl", "articlesBucket", "accessDatabase", "realms", "restrictedRealms"}:
         raise ValueError("Invalid app settings")
@@ -95,7 +95,7 @@ def write_realm_files(realm, output):
 
 
 def realm_index(data=DATA, restricted=()):
-    """List the built realms for the app's realm menu. A release marks the realms that need a signed-in account."""
+    """List the built realms for the app's realm menu. A release marks the restricted realms."""
     entries = []
     for realm in built_realms(data):
         settings = json.loads(realm.config.read_text())
