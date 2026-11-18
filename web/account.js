@@ -204,12 +204,13 @@ function dialog(title) {
   return node;
 }
 
-function signInLink(label, className) {
+// Signing in returns to `returnTo`, or to wherever the reader is by then.
+function signInLink(label, className, returnTo = null) {
   const link = element("a", className, label);
-  link.href = signInHref(location);
+  link.href = signInHref(returnTo ?? location);
   // The address changes as the reader moves around the graph.
   link.addEventListener("click", () => {
-    link.href = signInHref(location);
+    link.href = signInHref(returnTo ?? location);
   });
   return link;
 }
@@ -422,8 +423,8 @@ function signedIn(session, controls) {
   );
 }
 
-async function signedOut(failed, controls) {
-  controls.append(signInLink("Sign in", "quiet-button"));
+async function signedOut(failed, controls, returnTo) {
+  controls.append(signInLink("Sign in", "quiet-button", returnTo));
   if (!failed) return;
   const node = dialog("Sign in");
   const message = element("p", "", failed.message);
@@ -431,14 +432,17 @@ async function signedOut(failed, controls) {
   node.append(message);
   if (failed.code === "enrollment_required")
     node.append(await enrollmentDetails());
-  node.append(signInLink("Sign in with Google", "primary-button"));
+  node.append(signInLink("Sign in with Google", "primary-button", returnTo));
   node.showModal();
 }
 
-/** Adds the sign-in or account control beside About & copyright. */
-export async function initAccount(session, failed) {
+/**
+ * Adds the sign-in or account control beside About & copyright. `returnTo` is
+ * the address to open after signing in, when it is not the current one.
+ */
+export async function initAccount(session, failed, returnTo) {
   const controls = document.querySelector(".account-controls");
   if (!controls || session.kind === "local") return;
   if (session.kind === "signed-in") signedIn(session, controls);
-  else await signedOut(failed, controls);
+  else await signedOut(failed, controls, returnTo);
 }

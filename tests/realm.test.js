@@ -9,6 +9,7 @@ import {
   realmHref,
   realmLabel,
   reversedLinks,
+  unopenedAddress,
   validateLinks,
   validateRealm,
   validateRealms,
@@ -99,6 +100,19 @@ test("every address the app writes names its realm, because the default depends 
   assert.equal(addressWithRealm("?a=1", "psychology"), "?a=1&realm=psychology");
   // A named realm is kept, including one this viewer cannot open until signing in.
   assert.equal(addressWithRealm("?realm=philosophy", "psychology"), null);
+  const arrived = {
+    pathname: "/",
+    search: "?realm=philosophy",
+    hash: "#/nietzsche",
+    href: "ignored",
+  };
+  assert.deepEqual(unopenedAddress(arrived, "psychology"), {
+    pathname: "/",
+    search: "?realm=philosophy",
+    hash: "#/nietzsche",
+  });
+  assert.equal(unopenedAddress(arrived, "philosophy"), null);
+  assert.equal(unopenedAddress({ ...arrived, search: "" }, "psychology"), null);
 });
 
 test("the realm list marks the realms that need a signed-in account", () => {

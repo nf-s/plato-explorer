@@ -24,6 +24,7 @@ import {
   realmLabel,
   realmHref,
   reversedLinks,
+  unopenedAddress,
   validateLinks,
   validateRealm,
   validateRealms,
@@ -1101,7 +1102,7 @@ async function start() {
       );
     const data = dataPath(chosen);
     renderRealmPicker(chosen);
-    await initAccount(session, failed);
+    await initAccount(session, failed, unopenedAddress(location, chosen.id));
     const [realmResponse, response, linksResponse] = await Promise.all([
       fetch(`${data}realm.json`),
       fetch(`${data}graph.json`),

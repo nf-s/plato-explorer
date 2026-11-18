@@ -65,6 +65,16 @@ export function realmHref(id, nodeId = null) {
   return `./?realm=${encodeURIComponent(id)}${hash}`;
 }
 
+// An address that names a realm this viewer cannot open, such as a restricted
+// realm before signing in. The app then shows the default realm, which drops
+// the address's node, so signing in returns to the address as it arrived.
+export function unopenedAddress({ pathname, search, hash }, id) {
+  const requested = new URLSearchParams(search).get("realm");
+  return requested === null || requested === id
+    ? null
+    : { pathname, search, hash };
+}
+
 // An address that names no realm gets the one it opened, so a copied address
 // opens the same realm for a viewer with a different default. An address that
 // names a realm this viewer cannot open is kept, for signing in.
