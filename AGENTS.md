@@ -8,7 +8,7 @@ These instructions apply to work in Plato Explorer. Start with the [project hand
 - Deploy only when the user explicitly requests deployment and specifies or agrees to the destination.
 - For Plato Explorer, publish source to GitHub. Keep downloaded SEP and Wikipedia materials, generated corpus files, article screenshots, build reports, browser snapshots and deployment credentials out of Git and releases. Show the app and sidebar in README screenshots. Take them from the Wikipedia realms and keep SEP material out of them. README screenshots may show a brief, readable excerpt to illustrate a feature. Credit the articles beside the screenshots. See the [copyright notice](COPYRIGHT.md).
 
-Keep the README short and focused on the explorer, screenshots, local setup and copyright. Give it a large link to the deployed app near the top. Keep handoff and release notes in `docs/`.
+Keep the README short and focused on the explorer, screenshots, local setup and copyright. Give it a large link to the deployed app near the top. In the README and the copyright notice, describe the published app as the Wikipedia realms and give the reason the SEP realm is not published. Leave sign-in and approved accounts out of both. Keep handoff and release notes in `docs/`.
 
 ## Interface styling preferences — apply across projects
 

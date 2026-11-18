@@ -19,18 +19,20 @@
 
 ## Realms
 
-| Realm                                                                     | Source                                                     |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [Philosophy](https://plato-network.pages.dev/?realm=philosophy)           | Stanford Encyclopedia of Philosophy, for approved accounts |
-| [Philosophy](https://plato-network.pages.dev/?realm=philosophy-wikipedia) | Wikipedia                                                  |
-| [Psychology](https://plato-network.pages.dev/?realm=psychology)           | Wikipedia                                                  |
-| [Economics](https://plato-network.pages.dev/?realm=economics)             | Wikipedia                                                  |
-| [Society](https://plato-network.pages.dev/?realm=society)                 | Wikipedia                                                  |
-| [Religion](https://plato-network.pages.dev/?realm=religion)               | Wikipedia                                                  |
-| [Mythology](https://plato-network.pages.dev/?realm=mythology)             | Wikipedia                                                  |
-| [Art](https://plato-network.pages.dev/?realm=art)                         | Wikipedia                                                  |
+| Realm                                                                     | Source                                              |
+| ------------------------------------------------------------------------- | --------------------------------------------------- |
+| [Philosophy](https://plato-network.pages.dev/?realm=philosophy-wikipedia) | Wikipedia                                           |
+| [Psychology](https://plato-network.pages.dev/?realm=psychology)           | Wikipedia                                           |
+| [Economics](https://plato-network.pages.dev/?realm=economics)             | Wikipedia                                           |
+| [Society](https://plato-network.pages.dev/?realm=society)                 | Wikipedia                                           |
+| [Religion](https://plato-network.pages.dev/?realm=religion)               | Wikipedia                                           |
+| [Mythology](https://plato-network.pages.dev/?realm=mythology)             | Wikipedia                                           |
+| [Art](https://plato-network.pages.dev/?realm=art)                         | Wikipedia                                           |
+| Philosophy                                                                | Stanford Encyclopedia of Philosophy (not published) |
 
-A node found in several realms links to the others. The SEP's terms do not allow republishing its entries, so the published app shows that realm only to Google accounts its administrator has approved. Everyone else sees the Wikipedia realms. [Realms](docs/realms.md)
+A node found in several realms links to the others. [Realms](docs/realms.md)
+
+The explorer was first built for the Stanford Encyclopedia of Philosophy (SEP). The published app has the Wikipedia realms only. The SEP's terms do not allow its entries to be republished on a public website, so the SEP realm is not published. To explore it, [build it locally](#run-locally).
 
 ## Select a node
 

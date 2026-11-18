@@ -6,7 +6,7 @@ Plato Explorer's original code and accompanying documentation are dedicated to t
 
 The authors of individual SEP entries generally retain copyright in their work. The Metaphysics Research Lab at Stanford University holds copyright in the Stanford Encyclopedia of Philosophy as a whole. Plato Explorer is an independent project with no affiliation with or endorsement by Stanford University or the SEP. [SEP copyright information](https://plato.stanford.edu/info.html#c)
 
-The SEP terms permit individual readers to download and search entries and to share links to them. They limit electronic distribution of entries to specified personal devices and private correspondence, including qualifying closed groups. The terms do not grant general permission to republish the articles on a public website or in a repository. The published app therefore keeps the SEP realm out of its public files and shows it only to Google accounts its administrator has approved. For proposed uses outside those terms, seek permission from the rights holders. [SEP terms of use](https://plato.stanford.edu/info.html#terms)
+The SEP terms permit individual readers to download and search entries and to share links to them. They limit electronic distribution of entries to specified personal devices and private correspondence, including qualifying closed groups. The terms do not grant general permission to republish the articles on a public website or in a repository. The published app therefore has the Wikipedia realms only, and the SEP realm is not published. For proposed uses outside those terms, seek permission from the rights holders. [SEP terms of use](https://plato.stanford.edu/info.html#terms)
 
 ## Wikipedia material
 
