@@ -43,6 +43,6 @@ Keep the README short and focused on the explorer, screenshots, local setup and 
 
 ## Subagents
 
-- Automatically delegate independent, well-scoped units of work. Use the default coding model, not Astra, unless explicitly requested. Choose reasoning effort to suit the task.
+- Automatically delegate independent, well-scoped units of work. Choose reasoning effort to suit the task.
 - Assign clear file ownership, constraints and verification requirements. Share these instructions with each agent. Keep tightly coupled work with the main agent and avoid overlapping edits.
 - Agents should communicate dependencies and overlap. The main agent reviews changes, integrates results and verifies the complete outcome.
